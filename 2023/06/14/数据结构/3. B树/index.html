@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>3. B树 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="B树也称B-树,它是一颗多路平衡查找树。B树的定义：  每个节点最多有m-1个关键字（可以存有的键值对） 根节点最少可以只有1个关键字 非根节点至少有m&#x2F;2个关键字 每个节点中的关键字都按照从小到大的顺序排列，每个关键字的左子树中的所有关键字都小于它，而右子树中的所有关键字都大于它。 所有叶子节点都位于同一层，或者说根节点到每个叶子节点的长度都相同 每个节点都存有索引和数据，也就是对应的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3. B树">
+<meta property="og:url" content="https://ohyesc.github.io/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.%20B%E6%A0%91/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="B树也称B-树,它是一颗多路平衡查找树。B树的定义：  每个节点最多有m-1个关键字（可以存有的键值对） 根节点最少可以只有1个关键字 非根节点至少有m&#x2F;2个关键字 每个节点中的关键字都按照从小到大的顺序排列，每个关键字的左子树中的所有关键字都小于它，而右子树中的所有关键字都大于它。 所有叶子节点都位于同一层，或者说根节点到每个叶子节点的长度都相同 每个节点都存有索引和数据，也就是对应的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-06-14T08:11:24.812Z">
+<meta property="article:modified_time" content="2023-06-14T08:48:35.887Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.%20B%E6%A0%91/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '3. B树',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-06-14 16:48:35'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">3. B树</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-14T08:11:24.812Z" title="发表于 2023-06-14 16:11:24">2023-06-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-06-14T08:48:35.887Z" title="更新于 2023-06-14 16:48:35">2023-06-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="3. B树"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>B树也称B-树,它是一颗多路平衡查找树。B树的定义：</p>
+<ol>
+<li>每个节点最多有m-1个关键字（可以存有的键值对）</li>
+<li>根节点最少可以只有1个关键字</li>
+<li>非根节点至少有m&#x2F;2个关键字</li>
+<li>每个节点中的关键字都按照从小到大的顺序排列，每个关键字的左子树中的所有关键字都小于它，而右子树中的所有关键字都大于它。</li>
+<li>所有叶子节点都位于同一层，或者说根节点到每个叶子节点的长度都相同</li>
+<li>每个节点都存有索引和数据，也就是对应的key和value。</li>
+</ol>
+<p>描述一颗B树时需要指定它的阶数，阶数表示了一个节点最多有多少个孩子节点，一般用字母m表示阶数。根节点的关键字数量范围：1 &lt;&#x3D; k &lt;&#x3D; m-1，非根节点的关键字数量范围：m&#x2F;2 &lt;&#x3D; k &lt;&#x3D; m-1。比如这里有一个5阶的B树，根节点数量范围：1 &lt;&#x3D; k &lt;&#x3D; 4，非根节点数量范围：2 &lt;&#x3D; k &lt;&#x3D; 4。</p>
+<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><p>插入18，70，50，40<br><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743711338-c65fdde1-da60-45ce-804e-9a5f3801f373.png#clientId=u586e5c39-aa00-4&from=paste&height=110&id=ud35105a2&originHeight=110&originWidth=392&originalType=binary&ratio=1&rotation=0&showTitle=false&size=7011&status=done&style=none&taskId=uc6435cbb-7f71-414d-8fbf-cd3de4dbb0a&title=&width=392" alt="image.png"><br>插入22，发现这个节点的关键字已经大于4了，所以需要进行分裂<br><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743720840-bfdaae10-8467-4758-b025-bed09534aaac.png#clientId=u586e5c39-aa00-4&from=paste&height=183&id=u7b60e3e9&originHeight=183&originWidth=383&originalType=binary&ratio=1&rotation=0&showTitle=false&size=13272&status=done&style=none&taskId=u701f1220-2f13-46b3-abee-f628cab4c1e&title=&width=383" alt="image.png"><br>接着插入23，25，39<br><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743727528-a00b41b2-da45-4ecd-8336-cf01365e1ba9.png#clientId=u586e5c39-aa00-4&from=paste&height=132&id=u8edf6180&originHeight=132&originWidth=395&originalType=binary&ratio=1&rotation=0&showTitle=false&size=13054&status=done&style=none&taskId=uf7dc8cac-3096-41f4-984e-22037411c20&title=&width=395" alt="image.png"><br>分裂</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743732759-b841e4c0-0eda-4948-bf65-eb31821b6d74.png#clientId=u586e5c39-aa00-4&from=paste&height=179&id=u5000f80c&originHeight=179&originWidth=372&originalType=binary&ratio=1&rotation=0&showTitle=false&size=17269&status=done&style=none&taskId=u16cfbb8f-70b3-4fe2-8966-15d914db746&title=&width=372" alt="image.png"></p>
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><p>初始状态是下面这样的B树<br><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743766441-e8af2df4-2539-4301-95b9-21f24dd91320.png#clientId=u586e5c39-aa00-4&from=paste&height=207&id=uf00e83fe&originHeight=207&originWidth=448&originalType=binary&ratio=1&rotation=0&showTitle=false&size=26700&status=done&style=none&taskId=uca82b038-e878-4355-a052-80b06290b04&title=&width=448" alt="image.png"></p>
+<ol>
+<li>删除15，这种情况是删除叶子节点的元素，如果删除之后，节点数还是大于m&#x2F;2，这种情况只要直接删除即可</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743774850-18c5b6ce-7ca8-4be9-a456-cf6a5cf1c6fa.png#clientId=u586e5c39-aa00-4&from=paste&height=202&id=udd154095&originHeight=202&originWidth=446&originalType=binary&ratio=1&rotation=0&showTitle=false&size=21618&status=done&style=none&taskId=u9815b30f-bc04-4952-9fb2-fff6eed0b05&title=&width=446" alt="image.png"></p>
+<ol start="2">
+<li>删除22，这种情况的规则：22是非叶子节点，对于非叶子节点的删除，我们需要用后继key（元素）覆盖要删除的key，然后在后继key所在的子支中删除该后继key。所以将后继元素24移到被删除的22所在的节点。</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743781796-8a9b8e74-5079-4618-a46d-1178d983cb33.png#clientId=u586e5c39-aa00-4&from=paste&height=245&id=u994e40bb&originHeight=245&originWidth=437&originalType=binary&ratio=1&rotation=0&showTitle=false&size=33412&status=done&style=none&taskId=u0ffc708f-aaf7-45e8-a446-222734f22cf&title=&width=437" alt="image.png"><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743789193-afb2ab2f-ff30-4080-9083-56263e771956.png#clientId=u586e5c39-aa00-4&from=paste&height=242&id=u714fa0ec&originHeight=194&originWidth=434&originalType=binary&ratio=1&rotation=0&showTitle=false&size=25805&status=done&style=none&taskId=u599f4b14-adc0-425d-9ef5-6c4b73522a9&title=&width=542" alt="image.png"><br>此时发现26所在的节点只有一个元素，小于2个（m&#x2F;2），这个节点不符合要求，这时候的规则（向兄弟节点借元素）：如果删除叶子节点，如果删除元素后元素个数少于（m&#x2F;2），并且它的兄弟节点的元素大于（m&#x2F;2），也就是说兄弟节点的元素比最少值m&#x2F;2还多，将先将父节点的元素移到该节点，然后将兄弟节点的最后一个元素再移动到父节点。（右旋）<br><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743810859-6dc327dd-840e-4c31-bbb7-ffc416e92ee3.png#clientId=u586e5c39-aa00-4&from=paste&height=200&id=u29d54402&originHeight=192&originWidth=432&originalType=binary&ratio=1&rotation=0&showTitle=false&size=28722&status=done&style=none&taskId=ub2a5cbef-ae22-45e4-b75c-1a136c9ac35&title=&width=451" alt="image.png"><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743813245-eaf62cdc-986d-4f41-a49c-a5afa7d57bc4.png#clientId=u586e5c39-aa00-4&from=paste&height=203&id=u1fa6ca60&originHeight=203&originWidth=454&originalType=binary&ratio=1&rotation=0&showTitle=false&size=21750&status=done&style=none&taskId=u258ca984-5b29-4471-a3fa-24768c4d144&title=&width=454" alt="image.png"></p>
+<ol start="3">
+<li>接着删除28，删除叶子节点，删除后不满足要求，所以，我们需要考虑向兄弟节点借元素，但是，兄弟节点也没有多的节点（2个），借不了。如果遇到这种情况，首先，还是将先将父节点的元素移到该节点，然后，将当前节点及它的兄弟节点中的key合并，形成一个新的节点。</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743828252-c6424019-55bb-4636-b179-f453f9ab0214.png#clientId=u586e5c39-aa00-4&from=paste&height=239&id=ue2d78df6&originHeight=239&originWidth=453&originalType=binary&ratio=1&rotation=0&showTitle=false&size=30057&status=done&style=none&taskId=u2b11a882-2ca4-4174-a058-ee45b828270&title=&width=453" alt="image.png"><img src="https://cdn.nlark.com/yuque/0/2022/png/1251600/1651743830375-e055941b-9001-49c7-a7c3-c30f82e909e8.png#clientId=u586e5c39-aa00-4&from=paste&height=213&id=u08b3d0ca&originHeight=213&originWidth=446&originalType=binary&ratio=1&rotation=0&showTitle=false&size=26605&status=done&style=none&taskId=u3cb5b750-9950-47d0-a90e-511eedcfafd&title=&width=446" alt="image.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.%20B%E6%A0%91/">https://ohyesc.github.io/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.%20B%E6%A0%91/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%A0%91/">树</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/4.%20B+%E6%A0%91/" title="4. B+树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">4. B+树</div></div></a></div><div class="next-post pull-right"><a href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/2.%20%E4%BA%8C%E5%8F%89%E6%A0%91/" title="2. 二叉树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2. 二叉树</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1.%20%E6%A0%91%E7%9A%84%E5%AE%9A%E4%B9%89/" title="1. 树的定义"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">1. 树的定义</div></div></a></div><div><a href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/2.%20%E4%BA%8C%E5%8F%89%E6%A0%91/" title="2. 二叉树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">2. 二叉树</div></div></a></div><div><a href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/4.%20B+%E6%A0%91/" title="4. B+树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">4. B+树</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%92%E5%85%A5"><span class="toc-number">1.</span> <span class="toc-text">插入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4"><span class="toc-number">2.</span> <span class="toc-text">删除</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/1.%20%E6%A0%91%E7%9A%84%E5%AE%9A%E4%B9%89/" title="1. 树的定义">1. 树的定义</a><time datetime="2023-06-14T08:14:23.427Z" title="发表于 2023-06-14 16:14:23">2023-06-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/4.%20B+%E6%A0%91/" title="4. B+树">4. B+树</a><time datetime="2023-06-14T08:11:33.282Z" title="发表于 2023-06-14 16:11:33">2023-06-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.%20B%E6%A0%91/" title="3. B树">3. B树</a><time datetime="2023-06-14T08:11:24.812Z" title="发表于 2023-06-14 16:11:24">2023-06-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/06/14/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/2.%20%E4%BA%8C%E5%8F%89%E6%A0%91/" title="2. 二叉树">2. 二叉树</a><time datetime="2023-06-14T08:11:14.708Z" title="发表于 2023-06-14 16:11:14">2023-06-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/06/14/Git/git%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" title="Git常用命令">Git常用命令</a><time datetime="2023-06-14T05:51:19.755Z" title="发表于 2023-06-14 13:51:19">2023-06-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
