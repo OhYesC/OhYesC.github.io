@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2. 植⼊插件逻辑 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="以 Executor 为例，分析MyBatis是如何为Executor实例植入插件逻辑的。Executor实例是在开启 SqlSession 时被创建的 123456789101112131415161718&#x2F;&#x2F; -☆- DefaultSqlSessionFactorypublic SqlSession openSession() &amp;#123;    return openSessionFro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2. 植⼊插件逻辑">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/2.%20%E6%A4%8D%E2%BC%8A%E6%8F%92%E4%BB%B6%E9%80%BB%E8%BE%91-hyw7ef-zg840s/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="以 Executor 为例，分析MyBatis是如何为Executor实例植入插件逻辑的。Executor实例是在开启 SqlSession 时被创建的 123456789101112131415161718&#x2F;&#x2F; -☆- DefaultSqlSessionFactorypublic SqlSession openSession() &amp;#123;    return openSessionFro">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:35:47.196Z">
+<meta property="article:modified_time" content="2023-11-20T03:41:59.459Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="Mybatis源码解析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/2.%20%E6%A4%8D%E2%BC%8A%E6%8F%92%E4%BB%B6%E9%80%BB%E8%BE%91-hyw7ef-zg840s/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2. 植⼊插件逻辑',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-11-20 11:41:59'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2. 植⼊插件逻辑</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:35:47.196Z" title="发表于 2023-11-20 09:35:47">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T03:41:59.459Z" title="更新于 2023-11-20 11:41:59">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/Mybatis/">Mybatis</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/">插件机制</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2. 植⼊插件逻辑"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p>以 Executor 为例，分析MyBatis是如何为Executor实例植入插件逻辑的。Executor实例是在开启 SqlSession 时被创建的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// -☆- DefaultSqlSessionFactory</span><br><span class="line">public SqlSession openSession() &#123;</span><br><span class="line">    return openSessionFromDataSource(</span><br><span class="line">        configuration.getDefaultExecutorType(), null, false);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private SqlSession openSessionFromDataSource(ExecutorType execType, </span><br><span class="line">    TransactionIsolationLevel level, boolean autoCommit) &#123;</span><br><span class="line">    Transaction tx = null;</span><br><span class="line">    try &#123;</span><br><span class="line">        // 省略部分逻辑</span><br><span class="line">        // 创建 Executor</span><br><span class="line">        final Executor executor = configuration.newExecutor(tx, execType);</span><br><span class="line">        return new DefaultSqlSession(configuration, executor, autoCommit);</span><br><span class="line">    &#125;</span><br><span class="line">    catch (Exception e) &#123;...&#125; </span><br><span class="line">    finally &#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Executor 的创建过程封装在 Configuration 中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// -☆- Configuration</span><br><span class="line">public Executor newExecutor(Transaction transaction, </span><br><span class="line">    ExecutorType executorType) &#123;</span><br><span class="line">    executorType = executorType == null ?</span><br><span class="line">        defaultExecutorType : executorType;</span><br><span class="line">    executorType = executorType == null ?</span><br><span class="line">        ExecutorType.SIMPLE : executorType;</span><br><span class="line">    Executor executor;</span><br><span class="line">    // 根据 executorType 创建相应的 Executor 实例</span><br><span class="line">    if (ExecutorType.BATCH == executorType) &#123;...&#125;</span><br><span class="line">    else if (ExecutorType.REUSE == executorType) &#123;...&#125; </span><br><span class="line">    else &#123;</span><br><span class="line">        executor = new SimpleExecutor(this, transaction);</span><br><span class="line">    &#125;</span><br><span class="line">    if (cacheEnabled) &#123;</span><br><span class="line">        executor = new CachingExecutor(executor);</span><br><span class="line">    &#125;</span><br><span class="line">    // 植入插件</span><br><span class="line">    executor = (Executor) interceptorChain.pluginAll(executor);</span><br><span class="line">    </span><br><span class="line">    return executor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>newExecutor 方法在创建好 Executor 实例后，紧接着通过拦截器链 interceptorChain<br>为 Executor 实例植入代理逻辑。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class InterceptorChain &#123;</span><br><span class="line">    private final List&lt;Interceptor&gt; interceptors =</span><br><span class="line">        new ArrayList&lt;Interceptor&gt;();</span><br><span class="line">        </span><br><span class="line">    public Object pluginAll(Object target) &#123;</span><br><span class="line">        // 遍历拦截器集合</span><br><span class="line">        for (Interceptor interceptor : interceptors) &#123;</span><br><span class="line">            // 调用拦截器的 plugin 方法植入相应的插件逻辑</span><br><span class="line">            target = interceptor.plugin(target);</span><br><span class="line">        &#125;</span><br><span class="line">        return target;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    /** 添加插件实例到 interceptors 集合中 */</span><br><span class="line">    public void addInterceptor(Interceptor interceptor) &#123;</span><br><span class="line">        interceptors.add(interceptor);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    /** 获取插件列表 */</span><br><span class="line">    public List&lt;Interceptor&gt; getInterceptors() &#123;</span><br><span class="line">        return Collections.unmodifiableList(interceptors);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它的 pluginAll 方法会调用具体插件的plugin方法植入相应的插件逻辑。如果有多个插件，则会多次调用 plugin 方法，最终生成一个层层嵌套的代理类。形如下面：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610709097097-c6fba021-ffcd-4ada-9761-11f7223782fc.png#align=left&display=inline&height=363&originHeight=363&originWidth=562&size=26531&status=done&style=none&width=562" alt="image.png"><br>当 Executor 的某个方法被调用的时候，插件逻辑会先行执行。执行顺序由外而内</p>
+<p>plugin 方法是由具体的插件类实现，不过该方法代码一般比较固定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// -☆- ExamplePlugin</span><br><span class="line">public Object plugin(Object target) &#123;</span><br><span class="line">    return Plugin.wrap(target, this);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// -☆- Plugin</span><br><span class="line">public static Object wrap(Object target, Interceptor interceptor) &#123;</span><br><span class="line">    // 获取插件类 @Signature 注解内容，并生成相应的映射结构。形如下面</span><br><span class="line">    // &#123;</span><br><span class="line">    // Executor.class : [query, update, commit],</span><br><span class="line">    // ParameterHandler.class : [getParameterObject, setParameters]</span><br><span class="line">    // &#125;</span><br><span class="line">    Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; signatureMap = getSignatureMap(interceptor);</span><br><span class="line">    Class&lt;?&gt; type = target.getClass();</span><br><span class="line">    // 获取目标类实现的接口</span><br><span class="line">    Class&lt;?&gt;[] interfaces = getAllInterfaces(type, signatureMap);</span><br><span class="line">    if (interfaces.length &gt; 0) &#123;</span><br><span class="line">        // 通过 JDK 动态代理为目标类生成代理类</span><br><span class="line">        return Proxy.newProxyInstance(</span><br><span class="line">            type.getClassLoader(),</span><br><span class="line">            interfaces,</span><br><span class="line">            new Plugin(target, interceptor, signatureMap));</span><br><span class="line">    &#125;</span><br><span class="line">    return target;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>plugin 方法在内部调用了 Plugin 类的 wrap 方法，用于为目标对象生成代理。Plugin<br>类实现了InvocationHandler接口，因此它可以作为参数传给Proxy的newProxyInstance方法。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/2.%20%E6%A4%8D%E2%BC%8A%E6%8F%92%E4%BB%B6%E9%80%BB%E8%BE%91-hyw7ef-zg840s/">https://ohyesc.github.io/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/2.%20%E6%A4%8D%E2%BC%8A%E6%8F%92%E4%BB%B6%E9%80%BB%E8%BE%91-hyw7ef-zg840s/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Mybatis源码解析</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/1.%20%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86-hyw7ef-bz964g/" title="1. 插件机制原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">1. 插件机制原理</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/3.%20%E6%89%A7%E2%BE%8F%E6%8F%92%E4%BB%B6%E9%80%BB%E8%BE%91-hyw7ef-vnaxpc/" title="3. 执⾏插件逻辑"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">3. 执⾏插件逻辑</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/1.%20%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86-hyw7ef-bz964g/" title="1. 插件机制原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 插件机制原理</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/1.%20%E7%BC%93%E5%AD%98%E7%B1%BB%E4%BB%8B%E7%BB%8D-hyw7ef-tnwf0i/" title="1. 缓存类介绍"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 缓存类介绍</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E6%BA%90/1.%20%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E6%BA%90%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B-hyw7ef-oe0qhx/" title="1. 内置数据源初始化过程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 内置数据源初始化过程</div></div></a></div><div><a href="/2023/11/20/Mybatis/SQL%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/1.%20SQL%20%E6%89%A7%E2%BE%8F%E5%85%A5%E5%8F%A3-hyw7ef-zn5xqa/" title="1. SQL 执⾏入口"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. SQL 执⾏入口</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E6%98%A0%E5%B0%84%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%A7%A3%E6%9E%90%E5%85%A5%E5%8F%A3-hyw7ef-mh3yus/" title="1. 映射⽂件解析解析入口"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 映射⽂件解析解析入口</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 配置⽂件解析过程分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

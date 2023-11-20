@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>6. CPU消耗分析 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在 Linux 中， CPU 主要用于中断、内核及用户进程的任务处理，优先级为中断 &gt; 内核 &gt; 用户进程，在学习如何分析 CPU 消耗状况前，还有三个重要的概念要阐述。 ##概念  上下文切换每个 CPU （或多核心 CPU 中的每核 CPU ）同一时间只能执行一个线程， Linux 采用的是抢占式调度，即为每个线程分配一定的执行时间。线程执行时间到达而切换到其它线程时，就会触发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6. CPU消耗分析">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/CPU%E6%B6%88%E8%80%97%E5%88%86%E6%9E%90-gyqm04-ultiso/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="在 Linux 中， CPU 主要用于中断、内核及用户进程的任务处理，优先级为中断 &gt; 内核 &gt; 用户进程，在学习如何分析 CPU 消耗状况前，还有三个重要的概念要阐述。 ##概念  上下文切换每个 CPU （或多核心 CPU 中的每核 CPU ）同一时间只能执行一个线程， Linux 采用的是抢占式调度，即为每个线程分配一定的执行时间。线程执行时间到达而切换到其它线程时，就会触发">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:34:41.442Z">
+<meta property="article:modified_time" content="2023-11-20T03:47:48.892Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/CPU%E6%B6%88%E8%80%97%E5%88%86%E6%9E%90-gyqm04-ultiso/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '6. CPU消耗分析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-20 11:47:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">6. CPU消耗分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:34:41.442Z" title="发表于 2023-11-20 09:34:41">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T03:47:48.892Z" title="更新于 2023-11-20 11:47:48">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/JVM/">JVM</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/JVM/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/">性能调优</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="6. CPU消耗分析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p>在 Linux 中， CPU 主要用于中断、内核及用户进程的任务处理，优先级为中断 &gt; 内核 &gt; 用户进程，在学习如何分析 CPU 消耗状况前，还有三个重要的概念要阐述。</p>
+<p>##概念</p>
+<p><a name="df60102d"></a></p>
+<h3 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h3><p>每个 CPU （或多核心 CPU 中的每核 CPU ）同一时间只能执行一个线程， Linux 采用的是抢占式调度，即为每个线程分配一定的执行时间。线程执行时间到达而切换到其它线程时，就会触发上下文切换。上下文切换过多会造成内核占据较多的 CPU 使用，使得应用的响应速度下降。</p>
+<p>对于JAVA应用，典型的是进行文件IO操作、网络IO操作、锁等待或线程sleep时，当线程进入阻塞或等待，会触发上下文切换</p>
+<p><a name="aaa1b00b"></a></p>
+<h3 id="运行队列"><a href="#运行队列" class="headerlink" title="运行队列"></a>运行队列</h3><p>每个 CPU 都维护了一个可运行的线程队列。</p>
+<blockquote>
+<p>例如：4核CPU，JAVA应用启动了8个线程，且都是出于运行状态，那么在平均分配情况下，每个CPU中的运行队列就有2个线程</p>
+</blockquote>
+<p>通常系统的load由CPU运行队列来决定，运行队列值越大则线程需要消耗越长的时间才能执行完</p>
+<p>通常建议控制在每个 CPU 核上的运行队列为 1-3 个。</p>
+<p><a name="bbdff9f6"></a></p>
+<h3 id="利用率"><a href="#利用率" class="headerlink" title="利用率"></a>利用率</h3><p>CPU 利用率为 CPU 在用户进程、内核、中断处理、IO等待以及空亲五个部分使用的百分比。</p>
+<p>建议用户进程和内核进程消耗的 CPU 比率在 65%-70%&#x2F;30%-35% 左右。</p>
+<p><a name="937b4bc4"></a></p>
+<h2 id="分析方式"><a href="#分析方式" class="headerlink" title="分析方式"></a>分析方式</h2><p>在linux中，通过top或pidstat来查看进程中线程的CPU消耗情况</p>
+<p><a name="top"></a></p>
+<h3 id="top"><a href="#top" class="headerlink" title="top"></a>top</h3><p>top命令可以查看CPU消耗情况<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610708234294-8e56d3f7-ed28-4108-b3bf-38573509165a.png#align=left&display=inline&height=163&originHeight=163&originWidth=976&size=111115&status=done&style=none&width=976" alt="image.png"></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>us</td>
+<td>表示用户进程处理所占的百分比</td>
+</tr>
+<tr>
+<td>sy</td>
+<td>表示内核进程所占的百分比</td>
+</tr>
+<tr>
+<td>ni</td>
+<td>表示被 nice 命令改变优先级的任务所占的百分比</td>
+</tr>
+<tr>
+<td>id</td>
+<td>表示 CPU 空闲时间所占的百分比</td>
+</tr>
+<tr>
+<td>wa</td>
+<td>表示为在执行的过程中等待 IO 所占的百分比</td>
+</tr>
+<tr>
+<td>hi</td>
+<td>表示为硬件中断所占的百分比</td>
+</tr>
+<tr>
+<td>si</td>
+<td>表示为软件中断所占的百分比</td>
+</tr>
+</tbody></table>
+<p>对于多核CPU，上图显示的为多个CPU占用百分比总和，如果需要查看每个核的消耗情况</p>
+<blockquote>
+<p>进入top视图后，按 1</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610708243278-df4d661b-ffc7-4f84-8536-bf04d47437c7.png#align=left&display=inline&height=219&originHeight=219&originWidth=993&size=165080&status=done&style=none&width=993" alt="image.png"></p>
+<p>默认情况下，top视图显示为进程CPU的消耗情况。</p>
+<blockquote>
+<p>top 视图按 shift+h 后，可按线程查看 CPU 的消耗状况</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610708251370-f984c4d9-d40d-4f0b-9368-65bab6dc83b5.png#align=left&display=inline&height=271&originHeight=271&originWidth=987&size=229579&status=done&style=none&width=987" alt="image.png"></p>
+<p><a name="pidstat"></a></p>
+<h3 id="pidstat"><a href="#pidstat" class="headerlink" title="pidstat"></a>pidstat</h3><p>pidstat 是 SYSSTAT 中的工具，如需使用，请先安装</p>
+<blockquote>
+<p>pidstat 1 2 ，在 console 会每隔 1 秒输出目前活动进程的 CPU 消耗状况，共 2 次。</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610708257672-cb3d8322-bf88-444d-8940-ea8b1ade4aec.png#align=left&display=inline&height=218&originHeight=218&originWidth=964&size=113907&status=done&style=none&width=964" alt="image.png"><br>其中CPU表示当前进程使用到的CPU个数</p>
+<p>如需查看某进程中线程的CPU消耗：</p>
+<blockquote>
+<p>pidstat –p [PID] –t 1 5 可查看某进程中线程的 CPU 消耗状况</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610708268386-f08d31a0-d8e3-4478-bc38-f79ad92a8662.png#align=left&display=inline&height=354&originHeight=354&originWidth=974&size=233172&status=done&style=none&width=974" alt="image.png"><br>图中TID为线程ID，pidstat好处：可查看每个线程的具体CPU使用率的情况</p>
+<p>除了top和pidstat外，还可以采用vmstat来采样，查看CPU的上下文切换、运行队列和使用率情况</p>
+<p><a name="f93a5af0"></a></p>
+<h3 id="CPU消耗严重时的表现"><a href="#CPU消耗严重时的表现" class="headerlink" title="CPU消耗严重时的表现"></a>CPU消耗严重时的表现</h3><p>当 CPU 消耗严重时，主要体现在 us 、 sy 、 wa 或 hi 的值变高。对 JAVA 应用而言，主要体现在 us 、 sy 两个值上：</p>
+<p><a name="us"></a></p>
+<h4 id="us"><a href="#us" class="headerlink" title="us"></a>us</h4><p>us 值过高，表示运行的应用消耗了大部分的 CPU ，如下是找出具体消耗 CPU 的线程的办法：</p>
+<ul>
+<li>首先通过 top 或 pidstat 命令找出消耗 CPU 严重严重的线程及其 ID ，将些 ID 转化为十六进制的值。</li>
+<li>之后通过 kill -3 [javapid]或jstack的方式dump出应用的java线程信息，通过之前转化的十六进制的值找到对应的nid值的线程。该线程即为消耗 CPU 的线程。</li>
+<li>可多执行几次上述过程，以确保找到真实的消耗 CPU 的线程。</li>
+</ul>
+<p><a name="41dfb0bf"></a></p>
+<h5 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h5><ul>
+<li>线程一直处于可运行状态(Runnable)，通常是线程在执行无阻塞、循环、正则或纯粹的计算等</li>
+<li>频繁的GC<ul>
+<li>如每次请求分配较多内存，访问量高时，出现频繁GC。 进而堆积更多的请求，消耗的内存严重。 最严重时，导致full gc</li>
+</ul>
+</li>
+</ul>
+<p>频繁GC的情况要通过JVM内存的消耗来查找原因</p>
+<p><a name="sy"></a></p>
+<h4 id="sy"><a href="#sy" class="headerlink" title="sy"></a>sy</h4><p>sy 值高时，表示系统花费了更多的时间在进行线程切换，JAVA应用造成这种现象的主要原因是启动的线程比较多，且这些线程多数都处于不断的阻塞和执行状态的变化过程中，导致系统不断的切换线程，产生大量的上下文切换。</p>
+<p>此时，对JAVA应用而言，主要是找到线程不断切换的原因。可以采用</p>
+<blockquote>
+<p>kill -3 [javapid]或jstack -l [javapid]的方式dump出程序的线程信息，找出等待状态或锁过多的线程</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">public class SyHighDemo &#123;</span><br><span class="line">    private static int threadCount = 500;</span><br><span class="line">    private Random random = new Random();</span><br><span class="line">    private Object[] locks;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        if(args.length == 1) &#123;</span><br><span class="line">            threadCount = Integer.parseInt(args[0]);</span><br><span class="line">        &#125;</span><br><span class="line">        SyHighDemo demo = new SyHighDemo();</span><br><span class="line">        demo.runTest();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    private void runTest() throws Exception &#123;</span><br><span class="line">        locks = new Object[threadCount];</span><br><span class="line">        for(int i=0; i&lt;threadCount; i++) &#123;</span><br><span class="line">            locks[i] = new Object();</span><br><span class="line">        &#125;</span><br><span class="line">        for(int i=0; i&lt;threadCount; i++) &#123;</span><br><span class="line">            new Thread(new ATask(i)).start();</span><br><span class="line">            new Thread(new BTask(i)).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    class ATask implement Runnable &#123;</span><br><span class="line">        private Object lockObject = null;</span><br><span class="line">        public ATask(int i) &#123;</span><br><span class="line">            lockObject = locks[i];</span><br><span class="line">        &#125;</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while(true) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    synchronized (lockObject) &#123;</span><br><span class="line">                        lockObject.wait(random.nextInt(10);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; catch(Exception e) &#123;</span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    class BTask implement Runnable &#123;</span><br><span class="line">        private Object lockObject = null;</span><br><span class="line">        public BTask(int i) &#123;</span><br><span class="line">            lockObject = locks[i];</span><br><span class="line">        &#125;</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while(true) &#123;</span><br><span class="line">                synchronized (lockObject) &#123;</span><br><span class="line">                    lockObject.notifyAll();</span><br><span class="line">                &#125;</span><br><span class="line">                try &#123;</span><br><span class="line">                    Thread.sleep(random.nextInt(5));</span><br><span class="line">                &#125; catch(Exception e) &#123;</span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610708279248-8251e2ba-369d-4c23-9942-e9db1f9e6e9e.png#align=left&display=inline&height=271&originHeight=271&originWidth=980&size=129118&status=done&style=none&width=980" alt="image.png"></p>
+<p>由上可知：CPU在cs和sy上消耗很大，运行时使用jstack -l 查看程序状况，可知启动了很多线程，并且很多线程都处于TIMED_WAITING(on object monitor)状态和runnable状态的转换中。</p>
+<p>通过on object monitor对应的堆栈信息，可知：系统中锁竞争激烈，这就是导致线程上下文切换频繁的原因</p>
+<p><a name="25f9c7fa"></a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>如果us过高，表明应用程序占用了过多cpu<ul>
+<li>可以用top命令查看到是哪个进程的哪些线程耗费了过多cpu，然后用jstack -l pid导出dump，然后查找对应pid的十六进制，看看是哪个线程调了什么方法。</li>
+<li>解决方法：增加线程sleep，优化算法。</li>
+</ul>
+</li>
+<li>如果sy过高，表明大量的用户线程运行堵塞导致系统 频繁进行上下文切换。<ul>
+<li>可用jstack -l 查看线程运行状况，并配合vmstat 查看系统执行情况及cpu情况。</li>
+<li>解决方法：减少线程数，引入协程</li>
+</ul>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/CPU%E6%B6%88%E8%80%97%E5%88%86%E6%9E%90-gyqm04-ultiso/">https://ohyesc.github.io/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/CPU%E6%B6%88%E8%80%97%E5%88%86%E6%9E%90-gyqm04-ultiso/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JVM/">JVM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/JVM%E8%B0%83%E4%BC%98-gyqm04-bzsgq1/" title="7. JVM调优"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">7. JVM调优</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E7%BC%93%E6%85%A2%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90-gyqm04-mx7phk/" title="5. 程序执行缓慢原因分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">5. 程序执行缓慢原因分析</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Java/Jvm/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/JAVA%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6-gyqm04-rlzkaf/" title="1. JAVA代码执行机制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. JAVA代码执行机制</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E7%B1%BB%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8DTLAB-gyqm04-yi6cz0/" title="1. 内存分配TLAB"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 内存分配TLAB</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/JVM%E5%B8%B8%E8%A7%81%E9%85%8D%E7%BD%AE-gyqm04-ewlmi1/" title="1. JVM常见配置"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. JVM常见配置</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E5%92%8C%E4%BA%A4%E4%BA%92/JVM%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%9C%BA%E5%88%B6-gyqm04-gbbwey/" title="1. JVM线程同步机制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. JVM线程同步机制</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90-gyqm04-uvhai7/" title="1. 性能瓶颈分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 性能瓶颈分析</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/Java%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%E7%AE%80%E8%BF%B0-gyqm04-rs3maz/" title="2. Java代码编译过程简述"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">2. Java代码编译过程简述</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="toc-number">1.</span> <span class="toc-text">上下文切换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97"><span class="toc-number">2.</span> <span class="toc-text">运行队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E7%8E%87"><span class="toc-number">3.</span> <span class="toc-text">利用率</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E6%96%B9%E5%BC%8F"><span class="toc-number"></span> <span class="toc-text">分析方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#top"><span class="toc-number">1.</span> <span class="toc-text">top</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pidstat"><span class="toc-number">2.</span> <span class="toc-text">pidstat</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CPU%E6%B6%88%E8%80%97%E4%B8%A5%E9%87%8D%E6%97%B6%E7%9A%84%E8%A1%A8%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">CPU消耗严重时的表现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#us"><span class="toc-number">3.1.</span> <span class="toc-text">us</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-number">3.1.1.</span> <span class="toc-text">原因</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sy"><span class="toc-number">3.2.</span> <span class="toc-text">sy</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number"></span> <span class="toc-text">总结</span></a></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

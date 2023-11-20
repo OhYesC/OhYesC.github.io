@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>12. 总结HTTP特点 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="灵活可扩展这可以说是 HTTP 最重要的特点，也是HTTP能大行其道并碾压其他协议称霸于世的根本原因！它只规定了报文的基本格式，用空格分隔单词，用换行分隔字段，「header+body」等基本语义 但在语法层面并不做限制，它并没有强制规定header里应该传什么，也没有限制它底层应该用什么传输，这也为HTTPS添加SSL&#x2F;TLS层来加密传输，HTTP2使用帧，流来进行多路复用，HT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="12. 总结HTTP特点">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Http/12.%20%E6%80%BB%E7%BB%93HTTP%E7%89%B9%E7%82%B9-uh5p8t-vg2t82/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="灵活可扩展这可以说是 HTTP 最重要的特点，也是HTTP能大行其道并碾压其他协议称霸于世的根本原因！它只规定了报文的基本格式，用空格分隔单词，用换行分隔字段，「header+body」等基本语义 但在语法层面并不做限制，它并没有强制规定header里应该传什么，也没有限制它底层应该用什么传输，这也为HTTPS添加SSL&#x2F;TLS层来加密传输，HTTP2使用帧，流来进行多路复用，HT">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:35:05.730Z">
+<meta property="article:modified_time" content="2023-11-20T01:55:23.289Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="Http">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Http/12.%20%E6%80%BB%E7%BB%93HTTP%E7%89%B9%E7%82%B9-uh5p8t-vg2t82/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '12. 总结HTTP特点',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-20 09:55:23'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">12. 总结HTTP特点</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:35:05.730Z" title="发表于 2023-11-20 09:35:05">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T01:55:23.289Z" title="更新于 2023-11-20 09:55:23">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="12. 总结HTTP特点"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p><a name="17aee875"></a></p>
+<h2 id="灵活可扩展"><a href="#灵活可扩展" class="headerlink" title="灵活可扩展"></a>灵活可扩展</h2><p>这可以说是 HTTP 最重要的特点，也是HTTP能大行其道并碾压其他协议称霸于世的根本原因！它只规定了报文的基本格式，用空格分隔单词，用换行分隔字段，「header+body」等基本语义</p>
+<p>但在语法层面并不做限制，它并没有强制规定header里应该传什么，也没有限制它底层应该用什么传输，这也为HTTPS添加SSL&#x2F;TLS层来加密传输，HTTP2使用帧，流来进行多路复用，HTTP3使用UDP彻底解决解决队头阻塞问题提供了可能！后续如果又出现了牛逼的协议，底层也随时可以替换</p>
+<p><a name="f5ebc219"></a></p>
+<h2 id="可靠传���"><a href="#可靠传���" class="headerlink" title="可靠传���"></a>可靠传���</h2><p>不管底层是 TCP 还是QUIC（底层使用UDP），它们的传输都是可靠的，都能保证应用层请求响应的可靠传输，这一点很重要，不然传输过程中缺胳膊少腿，应用层就无法解析了。</p>
+<p><a name="a3eca4b9"></a></p>
+<h2 id="应用层协议"><a href="#应用层协议" class="headerlink" title="应用层协议"></a>应用层协议</h2><p>HTTP 是一个协议，很多人把 HTTP 和 TCP 混在了一起</p>
+<ul>
+<li>TCP 相当于高速公路，为我们提供了可靠的传输通道</li>
+<li>HTTP 规定货物的表现形式（header + 空行+ body）</li>
+</ul>
+<p>货物是否可从中间站运回（缓存机制）高速公路是否应该关闭（连接控制），至于货物如何可靠传输到目的地，那是 TCP 的事，与 HTTP 无关</p>
+<p><a name="c95c19f5"></a></p>
+<h2 id="请求应答模式"><a href="#请求应答模式" class="headerlink" title="请求应答模式"></a>请求应答模式</h2><p>HTTP 需要请求方发起请示，然后应答方对此作出响应，应答方不会无缘无故地发响应给请求方</p>
+<p>另外请求和应答方的角色是可以互换的</p>
+<p><a name="fef82728"></a></p>
+<h2 id="无状态"><a href="#无状态" class="headerlink" title="无状态"></a>无状态</h2><p>HTTP 的每个请求-应答都是无关的，即每次的收发报文都是完全独立，没有任何联系的，服务器收到每个请求响应后，不会记录这个请求的任何信息</p>
+<p><a name="c1318841"></a></p>
+<h4 id="Session-和-Cookie"><a href="#Session-和-Cookie" class="headerlink" title="Session 和 Cookie"></a>Session 和 Cookie</h4><ul>
+<li>Session 可以认为是 Server 用来追踪每个用户行为的一个会话</li>
+<li>server 会给每个用户分配一个这个 Session 的 Cookie</li>
+<li>通过 Cookie 这个头字段返回给 client</li>
+<li>之后 client 每次请求都会在 Cookie 里带上这个sessionId，server 拿到 sessionId 之后就知道是哪个用户发起的了</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707181959-c86b2815-ff01-4ab5-a519-1fbe3bd1f81a.png#align=left&display=inline&height=434&originHeight=434&originWidth=602&size=81717&status=done&style=none&width=602" alt="image.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Http/12.%20%E6%80%BB%E7%BB%93HTTP%E7%89%B9%E7%82%B9-uh5p8t-vg2t82/">https://ohyesc.github.io/2023/11/20/Http/12.%20%E6%80%BB%E7%BB%93HTTP%E7%89%B9%E7%82%B9-uh5p8t-vg2t82/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Http/">Http</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Http/11.%20HTTP%202.0%20%E6%A6%82%E8%A7%88-uh5p8t-rs65sz/" title="11. HTTP 2.0 概览"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">11. HTTP 2.0 概览</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Http/13.%20%E9%97%AE%E9%A2%98%E8%A7%A3%E6%9E%90-uh5p8t-alkhog/" title="13. 问题解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">13. 问题解析</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Http/1.%20%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-uh5p8t-cbiby7/" title="1. 网络基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 网络基础</div></div></a></div><div><a href="/2023/11/20/Http/2.%20%E7%AE%80%E5%8D%95HTTP%E5%8D%8F%E8%AE%AE-uh5p8t-zwmmog/" title="2. 简单HTTP协议"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">2. 简单HTTP协议</div></div></a></div><div><a href="/2023/11/20/Http/3.%20HTTP%20%E6%8A%A5%E6%96%87-uh5p8t-kss9oe/" title="3. HTTP 报文"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">3. HTTP 报文</div></div></a></div><div><a href="/2023/11/20/Http/4.%20%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C%E7%9A%84%20HTTP%20%E7%8A%B6%EF%BF%BD%EF%BF%BD%EF%BF%BD%E7%A0%81-uh5p8t-epqxm3/" title="4. 返回结果的 HTTP 状态码"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">4. 返回结果的 HTTP 状态码</div></div></a></div><div><a href="/2023/11/20/Http/5.%20%E4%B8%8E%20HTTP%20%E5%8D%8F%E4%BD%9C%E7%9A%84%20Web%20%E6%9C%8D%E5%8A%A1%E5%99%A8-uh5p8t-bzhd21/" title="5. 与 HTTP 协作的 Web 服务器"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">5. 与 HTTP 协作的 Web 服务器</div></div></a></div><div><a href="/2023/11/20/Http/6.%20HTTP%20%E9%A6%96%E9%83%A8-uh5p8t-do7gaf/" title="6. HTTP 首部"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">6. HTTP 首部</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%81%B5%E6%B4%BB%E5%8F%AF%E6%89%A9%E5%B1%95"><span class="toc-number">1.</span> <span class="toc-text">灵活可扩展</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E9%9D%A0%E4%BC%A0%EF%BF%BD%EF%BF%BD%EF%BF%BD"><span class="toc-number">2.</span> <span class="toc-text">可靠传���</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="toc-number">3.</span> <span class="toc-text">应用层协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82%E5%BA%94%E7%AD%94%E6%A8%A1%E5%BC%8F"><span class="toc-number">4.</span> <span class="toc-text">请求应答模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A0%E7%8A%B6%E6%80%81"><span class="toc-number">5.</span> <span class="toc-text">无状态</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Session-%E5%92%8C-Cookie"><span class="toc-number">5.0.1.</span> <span class="toc-text">Session 和 Cookie</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>3. LruCache | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="LruCache，顾名思义，是一种具有 LRU 策略的缓存实现类。除此之外，MyBatis 还提供了具有 FIFO 策略的缓存 FifoCache。不过并未提供 LFU 缓存 源代码： 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3. LruCache">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/3.%20LruCache-hyw7ef-mb7xya/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="LruCache，顾名思义，是一种具有 LRU 策略的缓存实现类。除此之外，MyBatis 还提供了具有 FIFO 策略的缓存 FifoCache。不过并未提供 LFU 缓存 源代码： 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:35:49.228Z">
+<meta property="article:modified_time" content="2023-11-20T03:40:21.606Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="Mybatis源码解析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/3.%20LruCache-hyw7ef-mb7xya/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '3. LruCache',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-11-20 11:40:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">3. LruCache</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:35:49.228Z" title="发表于 2023-11-20 09:35:49">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T03:40:21.606Z" title="更新于 2023-11-20 11:40:21">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/Mybatis/">Mybatis</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">缓存机制</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="3. LruCache"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p>LruCache，顾名思义，是一种具有 LRU 策略的缓存实现类。除此之外，MyBatis 还提<br><br>供了具有 FIFO 策略的缓存 FifoCache。不过并未提供 LFU 缓存</p>
+<p>源代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">public class LruCache implements Cache &#123;</span><br><span class="line">    private final Cache delegate;</span><br><span class="line">    private Map&lt;Object, Object&gt; keyMap;</span><br><span class="line">    private Object eldestKey;</span><br><span class="line">    </span><br><span class="line">    public LruCache(Cache delegate) &#123;</span><br><span class="line">        this.delegate = delegate;</span><br><span class="line">        setSize(1024);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public int getSize() &#123;</span><br><span class="line">        return delegate.getSize();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void setSize(final int size) &#123;</span><br><span class="line">        // 初始化 keyMap，注意，keyMap 的类型继承自 LinkedHashMap，</span><br><span class="line">        // 并覆盖了 removeEldestEntry 方法</span><br><span class="line">        keyMap = new LinkedHashMap&lt;Object, Object&gt;(size, .75F, true) &#123;</span><br><span class="line">            // 覆盖 LinkedHashMap 的 removeEldestEntry 方法</span><br><span class="line">            @Override</span><br><span class="line">            protected boolean removeEldestEntry(</span><br><span class="line">                Map.Entry&lt;Object, Object&gt; eldest) &#123;</span><br><span class="line">                boolean tooBig = size() &gt; size;</span><br><span class="line">                if (tooBig) &#123;</span><br><span class="line">                    // 获取将要被移除缓存项的键值</span><br><span class="line">                    eldestKey = eldest.getKey();</span><br><span class="line">                &#125;</span><br><span class="line">                return tooBig;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public void putObject(Object key, Object value) &#123;</span><br><span class="line">        // 存储缓存项</span><br><span class="line">        delegate.putObject(key, value);</span><br><span class="line">        cycleKeyList(key);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public Object getObject(Object key) &#123;</span><br><span class="line">        // 刷新 key 在 keyMap 中的位置</span><br><span class="line">        keyMap.get(key);</span><br><span class="line">        // 从被装饰类中获取相应缓存项</span><br><span class="line">        return delegate.getObject(key);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public Object removeObject(Object key) &#123;</span><br><span class="line">        // 从被装饰类中移除相应的缓存项</span><br><span class="line">        return delegate.removeObject(key);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public void clear() &#123;</span><br><span class="line">        delegate.clear();</span><br><span class="line">        keyMap.clear();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    private void cycleKeyList(Object key) &#123;</span><br><span class="line">        // 存储 key 到 keyMap 中</span><br><span class="line">        keyMap.put(key, key);</span><br><span class="line">        if (eldestKey != null) &#123;</span><br><span class="line">            // 从被装饰类中移除相应的缓存项</span><br><span class="line">            delegate.removeObject(eldestKey);</span><br><span class="line">            eldestKey = null;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>LruCache 的 keyMap 属性是实现LRU策略的关键，该属性类型继承自LinkedHashMap，<strong>并覆盖了removeEldestEntry方法</strong></p>
+<p>LinkedHashMap 可保持键值对的插入顺序，当插入一个新的键值对时，LinkedHashMap 内部的 tail 节点会<strong>指向最新</strong>插入的节点。head节点则指向<strong>第一个</strong>被插入的键值对，也就是最久未被访问的那个键值对。</p>
+<p>默认情况下，LinkedHashMap 仅维护键值对的插入顺序。若要基于 LinkedHashMap 实现 LRU 缓存，还需通过构造方法将 LinkedHashMap 的 <strong>accessOrder</strong> 属性设为 true，此时 LinkedHashMap 会维护键值对的访问顺序。</p>
+<p>上面代码中 getObject 方法中执行了这样一句代码keyMap.get(key) ，目的是<strong>刷新key 对应的键值对在 LinkedHashMap的位置</strong>。LinkedHashMap会将key对应的键值对移动到链表的<strong>尾部</strong>，尾部节点表示最久刚被访问过或者插入的节点。</p>
+<p>除了需将 accessOrder 设为 true，还需覆盖removeEldestEntry 方法。LinkedHashMap 在插入新的键值对时会调用该方法，以决定<strong>是否在插入新的键值对后，移除老的键值对</strong>。<br><br>当被装饰类的容量超出了keyMap的所规定的容量（由构造方法传入）后，keyMap会移除<strong>最长时间未被访问</strong>的键，并将该键保存到<strong>eldestKey</strong>中，然后由cycleKeyList方法将eldestKey传给被装饰类的removeObject方法，移除相应的缓存项目。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/3.%20LruCache-hyw7ef-mb7xya/">https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/3.%20LruCache-hyw7ef-mb7xya/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Mybatis源码解析</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/2.%20PerpetualCache-hyw7ef-twg3kf/" title="2. PerpetualCache"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2. PerpetualCache</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/4.%20BlockingCache-hyw7ef-ipkwkb/" title="4. BlockingCache"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">4. BlockingCache</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/1.%20%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86-hyw7ef-bz964g/" title="1. 插件机制原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 插件机制原理</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/1.%20%E7%BC%93%E5%AD%98%E7%B1%BB%E4%BB%8B%E7%BB%8D-hyw7ef-tnwf0i/" title="1. 缓存类介绍"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 缓存类介绍</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E6%BA%90/1.%20%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E6%BA%90%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B-hyw7ef-oe0qhx/" title="1. 内置数据源初始化过程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 内置数据源初始化过程</div></div></a></div><div><a href="/2023/11/20/Mybatis/SQL%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/1.%20SQL%20%E6%89%A7%E2%BE%8F%E5%85%A5%E5%8F%A3-hyw7ef-zn5xqa/" title="1. SQL 执⾏入口"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. SQL 执⾏入口</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E6%98%A0%E5%B0%84%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%A7%A3%E6%9E%90%E5%85%A5%E5%8F%A3-hyw7ef-mh3yus/" title="1. 映射⽂件解析解析入口"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 映射⽂件解析解析入口</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 配置⽂件解析过程分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>3. 内存调优及内存分配与回收策略 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="内存分配与回收策略对象的内存分配，往大方向讲，就是在堆上分配，对象主要分配在新生代的Eden区，如果启动了本地县城分配缓存，将按照线程优先在TLAB上分配，少数情况下也可能会直接分配在老年代中，分配规则并不是百分百固定的，其细节决定于当前使用的是哪一种垃圾收集器组合，还有虚拟机中与内存相关的参数的设置。  对象优先在Eden分配大多数情况下，对象在新生代Eden区中分配，当Eden区没有足够">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3. 内存调优及内存分配与回收策略">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98%E5%8F%8A%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-gyqm04-gv7rd2/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="内存分配与回收策略对象的内存分配，往大方向讲，就是在堆上分配，对象主要分配在新生代的Eden区，如果启动了本地县城分配缓存，将按照线程优先在TLAB上分配，少数情况下也可能会直接分配在老年代中，分配规则并不是百分百固定的，其细节决定于当前使用的是哪一种垃圾收集器组合，还有虚拟机中与内存相关的参数的设置。  对象优先在Eden分配大多数情况下，对象在新生代Eden区中分配，当Eden区没有足够">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:34:42.647Z">
+<meta property="article:modified_time" content="2023-11-20T06:11:10.707Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98%E5%8F%8A%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-gyqm04-gv7rd2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '3. 内存调优及内存分配与回收策略',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-20 14:11:10'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">3. 内存调优及内存分配与回收策略</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:34:42.647Z" title="发表于 2023-11-20 09:34:42">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T06:11:10.707Z" title="更新于 2023-11-20 14:11:10">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/JVM/">JVM</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/JVM/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/">内存回收</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="3. 内存调优及内存分配与回收策略"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p><a name="2c52bdaa"></a></p>
+<h2 id="内存分配与回收策略"><a href="#内存分配与回收策略" class="headerlink" title="内存分配与回收策略"></a>内存分配与回收策略</h2><p>对象的内存分配，往大方向讲，就是在堆上分配，对象主要分配在新生代的Eden区，如果启动了本地县城分配缓存，将按照线程优先在TLAB上分配，少数情况下也可能会直接分配在老年代中，分配规则并不是百分百固定的，其细节决定于当前使用的是哪一种垃圾收集器组合，还有虚拟机中与内存相关的参数的设置。</p>
+<p><a name="82233950"></a></p>
+<h3 id="对象优先在Eden分配"><a href="#对象优先在Eden分配" class="headerlink" title="对象优先在Eden分配"></a>对象优先在Eden分配</h3><p>大多数情况下，对象在新生代Eden区中分配，当Eden区没有足够空间进行分配时，虚拟机将进行一次Minor GC</p>
+<p><a name="121065f3"></a></p>
+<h4 id="Minor-GC和Full-GC有什么不一样吗"><a href="#Minor-GC和Full-GC有什么不一样吗" class="headerlink" title="Minor GC和Full GC有什么不一样吗"></a>Minor GC和Full GC有什么不一样吗</h4><p>-<br>新生代GC（Minor GC）：指发生在新生代的垃圾收集动作，因为java对象大多都具备朝生夕灭的特性，所以Minor GC非常频繁，一般回收速度也比较快。</p>
+<p>-<br>老年代GC（Major GC&#x2F;Full GC）：指发生在老年代的GC，出现了Major GC，经常会伴随着至少一次的Minor GC（但非绝对，在Parallel Scavenge收集器的手机策略里有直接进行Major GC的策略选择过程）Major GC的速度一般会比Minor GC慢10倍以上。</p>
+<p><a name="bb2660c0"></a></p>
+<h3 id="大对象直接进入老年代"><a href="#大对象直接进入老年代" class="headerlink" title="大对象直接进入老年代"></a>大对象直接进入老年代</h3><p>所谓的大对象是指，需要大量连续内存空间的java对象，最典型的大对象就是那种很长的字符串以及数组，大对象对虚拟机的内存分配来说就是一个坏消息，经常出现大对象容易导致内存还有不少空间时就提前触发垃圾收集以获取足够的连续时间来“安置”它们。虚拟机提供了-XX：PretenureSizeThreshold参数，令大于这个设置值的对戏那个直接在老年代分配，这样做的目的是避免在Eden区以及Survivor区之间发生大量的内存复制。</p>
+<p>-XX：PretenureSizeThreshold参数只对Serial和ParNew两款收集器有效，Parallel Scavenge的收集器不认识这个参数，Parallel Scavenge收集器一般并不需要设置，如果遇到必须使用这个参数的场合，可以考虑ParNew加CMS的收集器组合。</p>
+<p><a name="7331f429"></a></p>
+<h3 id="长期存活的对象将进入老年代"><a href="#长期存活的对象将进入老年代" class="headerlink" title="长期存活的对象将进入老年代"></a>长期存活的对象将进入老年代</h3><p>虚拟机为了采用分代收集的思想来管理内存，利用每个对象定义的对象年龄（Age）计数器，如果对象在Eden出生并经历了第一次Minor GC后仍然存活，并且能被Survivor接纳的话，将移动到Survivor空间中，并且对象年龄设为1，对象在Survivor区中每熬过一次Minor GC，年龄就增加1岁，当他的年龄增加到一定的程度（默认为15岁），就会被晋升到老年代，对象晋升到老年代的年龄阀值，可以通过参数-XX：MaxTenuringThreshold设置。</p>
+<p><a name="ff5ddf98"></a></p>
+<h3 id="动态对象年龄判定"><a href="#动态对象年龄判定" class="headerlink" title="动态对象年龄判定"></a>动态对象年龄判定</h3><p>为了更好的适应不同的成都的内存状况，虚拟机并不是永远地要求对象的年龄必须达到了MaxTenuringThreshold才能晋升老年代，如果在Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于或等于该年龄的对象就可以直接进入老年代，无需等到MaxTenuringThreshold中要求的年龄。</p>
+<p><a name="22234ab1"></a></p>
+<h3 id="空间分配担保"><a href="#空间分配担保" class="headerlink" title="空间分配担保"></a>空间分配担保</h3><p>在发生Minor GC之前，虚拟机会先检查老年代最大可用的连续空间是否大于新生代所有对戏那个总空间</p>
+<ul>
+<li><p>如果条件成立，那么Minor GC可以确保是安全的。</p>
+</li>
+<li><p>如果不成立，则虚拟机会查看HandlePromotionFailure设置值是否允许担保失败</p>
+<ul>
+<li><p>如果允许，那么会继续检查老年代最大可用的连续控件是否大于历次晋升到老年代对象的平均大小</p>
+<ul>
+<li>如果大于，将尝试着进行一次Minor GC，尽管这次Minor GC是有风险的</li>
+<li>如果小于，或者HandlePromotionFailure设置不允许冒险，那这也要改为进行一次Full GC。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>冒险：前面提到过，新生代使用复制收集算法，但为了内存利用率，只是用其中一个Survivor空间来作为轮换备份，因此当出现大量对象在Minor GC后仍然存活的情况（最极端的情况就是内存回收后新生代中所有对象都存活），就需要老年代进行分配担保，把Survivor无法容纳的对象直接进入老年代。</p>
+<p>取平均值进行比较其实仍然是一种动态概率的手段，也就是说，如果某次Minor GC存活后的对象突增，远远高于平均值的话，依然会导致担保失败，如果发生了担保失败，那就治好在失败后重新发生一次Full GC，虽然担保失败的时候绕的圈子是最大的，但大部分的时候还是会打开分配担保的，避免Full GC过于频繁。</p>
+<hr>
+<p><a name="76a1bb07"></a></p>
+<h2 id="内存调优"><a href="#内存调优" class="headerlink" title="内存调优"></a>内存调优</h2><p>JVM内存调优，主要是减少GC的频率和减少Full GC的次数，Full GC的时候会极大地影响系统的性能。所以在此基础上，更加要关注会导致Full GC的情况。</p>
+<p><a name="78cc83aa"></a></p>
+<h3 id="容易导致Full-GC的情况"><a href="#容易导致Full-GC的情况" class="headerlink" title="容易导致Full GC的情况"></a>容易导致Full GC的情况</h3><p>-<br>年老代空间不足</p>
+<ul>
+<li><p>分配足够大空间给old gen。</p>
+</li>
+<li><p>避免直接创建过大对象或者数组，否则会绕过年轻代直接进入年老代。</p>
+</li>
+<li><p>应该使对象尽量在年轻代就被回收，或待得时间尽量久，避免过早的把对象移进年老代。</p>
+</li>
+<li><p>方法区的永久代空间不足</p>
+<ul>
+<li>分配足够大空间给。</li>
+<li>避免创建过多的静态对象。</li>
+</ul>
+</li>
+<li><p>被显示调用System.gc()</p>
+<ul>
+<li>通常情况下不要显示地触发GC，让JVM根据自己的机制实现。</li>
+</ul>
+</li>
+</ul>
+<p><a name="dc899d74"></a></p>
+<h3 id="JVM堆内存分配问题讨论"><a href="#JVM堆内存分配问题讨论" class="headerlink" title="JVM堆内存分配问题讨论"></a>JVM堆内存分配问题讨论</h3><ul>
+<li><p>年轻代过小（年老代过大）</p>
+<ul>
+<li>导致频繁发生GC，增大系统消耗</li>
+<li>容易让普通大文件直接进入年老代，从而更容易诱发Full GC</li>
+</ul>
+</li>
+<li><p>年轻代过大（年老大过小）</p>
+<ul>
+<li>导致年老代过小，从而更容易诱发Full GC</li>
+<li>GC耗时增加，降低GC的效率</li>
+</ul>
+</li>
+<li><p>Eden过大（survivor过小）</p>
+<ul>
+<li>Minor GC时容易让普通大文件直接绕过survivor进入年老代，从而更容易诱发Full GC</li>
+</ul>
+</li>
+<li><p>Eden过小（survivor过大）</p>
+<ul>
+<li>导致GC频率升高，影响系统性能</li>
+</ul>
+</li>
+<li><p>调优策略</p>
+<ul>
+<li>保证系统吞吐量优先</li>
+<li>减少GC暂停时间优先</li>
+</ul>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98%E5%8F%8A%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-gyqm04-gv7rd2/">https://ohyesc.github.io/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98%E5%8F%8A%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-gyqm04-gv7rd2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JVM/">JVM</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6(%E6%96%B0%E7%94%9F%E4%BB%A3%E3%80%81%E8%80%81%E7%94%9F%E4%BB%A3)-gyqm04-dhre0s/" title="7. 内存回收(新生代、老生代)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">7. 内存回收(新生代、老生代)</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Java/Jvm/%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E5%92%8C%E4%BA%A4%E4%BA%92/JVM%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%9C%BA%E5%88%B6-gyqm04-gbbwey/" title="1. JVM线程同步机制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">1. JVM线程同步机制</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Java/Jvm/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/JAVA%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6-gyqm04-rlzkaf/" title="1. JAVA代码执行机制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. JAVA代码执行机制</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E7%B1%BB%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8DTLAB-gyqm04-yi6cz0/" title="1. 内存分配TLAB"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 内存分配TLAB</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6/JVM%E5%B8%B8%E8%A7%81%E9%85%8D%E7%BD%AE-gyqm04-ewlmi1/" title="1. JVM常见配置"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. JVM常见配置</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E5%92%8C%E4%BA%A4%E4%BA%92/JVM%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%9C%BA%E5%88%B6-gyqm04-gbbwey/" title="1. JVM线程同步机制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. JVM线程同步机制</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88%E5%88%86%E6%9E%90-gyqm04-uvhai7/" title="1. 性能瓶颈分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 性能瓶颈分析</div></div></a></div><div><a href="/2023/11/20/Java/Jvm/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6/Java%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%E7%AE%80%E8%BF%B0-gyqm04-rs3maz/" title="2. Java代码编译过程简述"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">2. Java代码编译过程简述</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5"><span class="toc-number">1.</span> <span class="toc-text">内存分配与回收策略</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E4%BC%98%E5%85%88%E5%9C%A8Eden%E5%88%86%E9%85%8D"><span class="toc-number">1.1.</span> <span class="toc-text">对象优先在Eden分配</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Minor-GC%E5%92%8CFull-GC%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E4%B8%80%E6%A0%B7%E5%90%97"><span class="toc-number">1.1.1.</span> <span class="toc-text">Minor GC和Full GC有什么不一样吗</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%A7%E5%AF%B9%E8%B1%A1%E7%9B%B4%E6%8E%A5%E8%BF%9B%E5%85%A5%E8%80%81%E5%B9%B4%E4%BB%A3"><span class="toc-number">1.2.</span> <span class="toc-text">大对象直接进入老年代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%95%BF%E6%9C%9F%E5%AD%98%E6%B4%BB%E7%9A%84%E5%AF%B9%E8%B1%A1%E5%B0%86%E8%BF%9B%E5%85%A5%E8%80%81%E5%B9%B4%E4%BB%A3"><span class="toc-number">1.3.</span> <span class="toc-text">长期存活的对象将进入老年代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E5%AF%B9%E8%B1%A1%E5%B9%B4%E9%BE%84%E5%88%A4%E5%AE%9A"><span class="toc-number">1.4.</span> <span class="toc-text">动态对象年龄判定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D%E6%8B%85%E4%BF%9D"><span class="toc-number">1.5.</span> <span class="toc-text">空间分配担保</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98"><span class="toc-number">2.</span> <span class="toc-text">内存调优</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%B9%E6%98%93%E5%AF%BC%E8%87%B4Full-GC%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">2.1.</span> <span class="toc-text">容易导致Full GC的情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JVM%E5%A0%86%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E9%97%AE%E9%A2%98%E8%AE%A8%E8%AE%BA"><span class="toc-number">2.2.</span> <span class="toc-text">JVM堆内存分配问题讨论</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

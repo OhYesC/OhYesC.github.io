@@ -1,0 +1,679 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>6. HTTP 首部 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="HTTP 协议的请求和响应报文中必定包含 HTTP 首部，只是我们平时 在使用 Web 的过程中感受不到它。  HTTP 报文首部HTTP 协议的请求和响应报文中必定包含HTTP首部。 首部内容为客户端和服务器分别处理请求和响应提供所需要的信息。对于客户端用户来说，这些信息中的大部分内容都无须亲自查看。  HTTP 请求报文在请求中，HTTP 报文由方法、URI、HTTP 版本、HTTP 首部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6. HTTP 首部">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Http/6.%20HTTP%20%E9%A6%96%E9%83%A8-uh5p8t-do7gaf/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="HTTP 协议的请求和响应报文中必定包含 HTTP 首部，只是我们平时 在使用 Web 的过程中感受不到它。  HTTP 报文首部HTTP 协议的请求和响应报文中必定包含HTTP首部。 首部内容为客户端和服务器分别处理请求和响应提供所需要的信息。对于客户端用户来说，这些信息中的大部分内容都无须亲自查看。  HTTP 请求报文在请求中，HTTP 报文由方法、URI、HTTP 版本、HTTP 首部">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:35:09.683Z">
+<meta property="article:modified_time" content="2023-11-20T01:53:36.760Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="Http">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Http/6.%20HTTP%20%E9%A6%96%E9%83%A8-uh5p8t-do7gaf/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '6. HTTP 首部',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-20 09:53:36'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">6. HTTP 首部</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:35:09.683Z" title="发表于 2023-11-20 09:35:09">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T01:53:36.760Z" title="更新于 2023-11-20 09:53:36">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="6. HTTP 首部"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p>HTTP 协议的请求和响应报文中必定包含 HTTP 首部，只是我们平时 在使用 Web 的过程中感受不到它。</p>
+<p><a name="a03cac6f"></a></p>
+<h2 id="HTTP-报文首部"><a href="#HTTP-报文首部" class="headerlink" title="HTTP 报文首部"></a>HTTP 报文首部</h2><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705396476-08a940df-9571-4b07-a904-f170c1b5ff9a.png#align=left&display=inline&height=243&originHeight=243&originWidth=676&size=122355&status=done&style=none&width=676" alt="image.png"><br>HTTP 协议的请求和响应报文中必定包含HTTP首部。</p>
+<p>首部内容为客户端和服务器分别处理请求和响应提供所需要的信息。对于客户端用户来说，这些信息中的大部分内容都无须亲自查看。</p>
+<p><a name="464f14e2"></a></p>
+<h3 id="HTTP-请求报文"><a href="#HTTP-请求报文" class="headerlink" title="HTTP 请求报文"></a>HTTP 请求报文</h3><p>在请求中，HTTP 报文由方法、URI、HTTP 版本、HTTP 首部字段等 部分构成。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705406080-f0789f68-e523-4c66-a819-283cd4b7787d.png#align=left&display=inline&height=195&originHeight=195&originWidth=750&size=100094&status=done&style=none&width=750" alt="image.png"></p>
+<p>示例信息<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705420161-2e560b47-12db-456b-946f-71f8653510a0.png#align=left&display=inline&height=421&originHeight=421&originWidth=996&size=206632&status=done&style=none&width=996" alt="image.png"><br><a name="5b3dafab"></a></p>
+<h3 id="HTTP-响应报文"><a href="#HTTP-响应报文" class="headerlink" title="HTTP 响应报文"></a>HTTP 响应报文</h3><p>在响应中，HTTP 报文由 HTTP 版本、状态码（数字和原因短语）、 HTTP 首部字段 3 部分构成。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705434200-27b50cbd-bf7e-40f2-82a2-77c58c4ac7fd.png#align=left&display=inline&height=196&originHeight=196&originWidth=731&size=97831&status=done&style=none&width=731" alt="image.png"></p>
+<p>示例信息<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705447242-44a876e3-3dfa-41c0-82a6-e6a2a0a437b1.png#align=left&display=inline&height=213&originHeight=213&originWidth=763&size=81291&status=done&style=none&width=763" alt="image.png"></p>
+<p>在报文众多的字段当中，HTTP首部字段包含的信息最为丰富。首部字段同时存在于请求和响应报文内，并涵盖 HTTP报文相关的内容信息。</p>
+<p><a name="d6ea36b4"></a></p>
+<h2 id="HTTP-首部字段"><a href="#HTTP-首部字段" class="headerlink" title="HTTP 首部字段"></a>HTTP 首部字段</h2><p><a name="2f970acb"></a></p>
+<h3 id="HTTP-首部字段传递重要信息"><a href="#HTTP-首部字段传递重要信息" class="headerlink" title="HTTP 首部字段传递重要信息"></a>HTTP 首部字段传递重要信息</h3><p>HTTP 首部字段是构成 HTTP报文的要素之一。在客户端与服务器之间以HTTP协议进行通信的过程中，无论是请求还是响应都会使用首部字段，它能起到传递额外重要信息的作用。</p>
+<p>使用首部字段是为了给浏览器和服务器提供报文主体大小、所使用的语言、认证信息等内容。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705456353-82e2c28b-8879-49d9-8588-dbd75afcc996.png#align=left&display=inline&height=270&originHeight=270&originWidth=740&size=161062&status=done&style=none&width=740" alt="image.png"></p>
+<p><a name="fd7cce43"></a></p>
+<h3 id="HTTP-首部字段结构"><a href="#HTTP-首部字段结构" class="headerlink" title="HTTP 首部字段结构"></a>HTTP 首部字段结构</h3><p>HTTP 首部字段是由首部字段名和字段值构成的，中间用冒号“:” 分隔</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">首部字段名: 字段值</span><br><span class="line"></span><br><span class="line">Content-Type: text/html  // 表示报文主体对象类型。</span><br></pre></td></tr></table></figure>
+
+<p>字段值对应单个 HTTP 首部字段可以有多个值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Keep-Alive: timeout=15, max=100</span><br></pre></td></tr></table></figure>
+
+<p><a name="2542249d"></a></p>
+<h4 id="若-HTTP-首部字段重复了会如何"><a href="#若-HTTP-首部字段重复了会如何" class="headerlink" title="若 HTTP 首部字段重复了会如何"></a>若 HTTP 首部字段重复了会如何</h4><p>这种情况在规范内尚未明确，根据浏览器内部处理逻辑的不同，结果可能并不一致。</p>
+<ul>
+<li>有些浏览器会优先处理第一次出现的首部字段，</li>
+<li>有些则会优先处理最后出现的首部字段。</li>
+</ul>
+<p><a name="2a4d97cf"></a></p>
+<h3 id="4-种-HTTP-首部字段类型"><a href="#4-种-HTTP-首部字段类型" class="headerlink" title="4 种 HTTP 首部字段类型"></a>4 种 HTTP 首部字段类型</h3><p>根据实际用途被分为以下 4 种类型</p>
+<ul>
+<li>通用首部字段（General Header Fields）<ul>
+<li>请求报文和响应报文两方都会使用的首部</li>
+</ul>
+</li>
+<li>请求首部字段（Request Header Fields）<ul>
+<li>从客户端向服务器端发送请求报文时使用的首部。补充了请求的附加内容、客户端信息、响应内容相关优先级等信息。</li>
+</ul>
+</li>
+<li>响应首部字段（Response Header Fields）<ul>
+<li>从服务器端向客户端返回响应报文时使用的首部。补充了响应的附加内容，也会要求客户端附加额外的内容信息。</li>
+</ul>
+</li>
+<li>实体首部字段（Entity Header Fields）<ul>
+<li>针对请求报文和响应报文的实体部分使用的首部。补充了资源内容更新时间等与实体有关的信息</li>
+</ul>
+</li>
+</ul>
+<p><a name="293c8008"></a></p>
+<h3 id="HTTP-1-1-首部字段一览"><a href="#HTTP-1-1-首部字段一览" class="headerlink" title="HTTP&#x2F;1.1 首部字段一览"></a>HTTP&#x2F;1.1 首部字段一览</h3><p>通用首部字段<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705469524-a31056dc-c811-42dd-9f3b-981e4079a24a.png#align=left&display=inline&height=485&originHeight=485&originWidth=714&size=102069&status=done&style=none&width=714" alt="image.png"></p>
+<p>请求首部字段<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705483306-6df41c2e-ce7e-4441-bbfb-12de7f7e9b46.png#align=left&display=inline&height=668&originHeight=668&originWidth=823&size=172342&status=done&style=none&width=823" alt="image.png"><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705493069-a1a3d799-a190-4319-9014-d07b52f83a00.png#align=left&display=inline&height=294&originHeight=294&originWidth=838&size=77221&status=done&style=none&width=838" alt="image.png"></p>
+<p>响应首部字段<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705504468-bd9f1f58-87b8-4637-899e-4c05ebb1b821.png#align=left&display=inline&height=491&originHeight=491&originWidth=784&size=124307&status=done&style=none&width=784" alt="image.png"></p>
+<p>实体首部字段<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705514444-b77b06b7-22b8-4441-8a71-030581d5acdf.png#align=left&display=inline&height=525&originHeight=525&originWidth=706&size=124001&status=done&style=none&width=706" alt="image.png"></p>
+<p><a name="a2be9933"></a></p>
+<h3 id="非-HTTP-1-1-首部字段"><a href="#非-HTTP-1-1-首部字段" class="headerlink" title="非 HTTP&#x2F;1.1 首部字段"></a>非 HTTP&#x2F;1.1 首部字段</h3><p>不限于 RFC2616 中定 义的 47 种首部字段。还有 Cookie、Set-Cookie 和 Content-Disposition 等在其他 RFC 中定义的首部字段，它们的使用频率也很高。</p>
+<p>这些非正式的首部字段统一归纳在 RFC4229 HTTP Header Field Registrations 中。</p>
+<p><a name="856db02c"></a></p>
+<h3 id="End-to-end-首部和-Hop-by-hop-首部"><a href="#End-to-end-首部和-Hop-by-hop-首部" class="headerlink" title="End-to-end 首部和 Hop-by-hop 首部"></a>End-to-end 首部和 Hop-by-hop 首部</h3><p>HTTP 首部字段将定义成缓存代理和非缓存代理的行为，分成 2 种类型</p>
+<ul>
+<li>端到端首部（End-to-end Header）<ul>
+<li>分在此类别中的首部会转发给请求&#x2F;响应对应的最终接收目标</li>
+<li>且必须保存在由缓存生成的响应中</li>
+<li>另外规定它必须被转发</li>
+</ul>
+</li>
+<li>逐跳首部（Hop-by-hop Header）<ul>
+<li>分在此类别中的首部只对单次转发有效</li>
+<li>会因通过缓存或代理而不再转发</li>
+<li>HTTP&#x2F;1.1 和之后版本中，如果要使用hop-by-hop首部，需提供Connection首部字段。</li>
+</ul>
+</li>
+</ul>
+<p><strong>逐跳首部字段</strong></p>
+<ul>
+<li>Connection</li>
+<li>Keep-Alive</li>
+<li>Proxy-Authenticate</li>
+<li>Proxy-Authorization</li>
+<li>Trailer</li>
+<li>TE</li>
+<li>Transfer-Encoding</li>
+<li>Upgrade</li>
+</ul>
+<p><strong>其他所有字段都属于端到端首部</strong></p>
+<p><a name="1983674c"></a></p>
+<h2 id="HTTP-1-1-通用首部字段"><a href="#HTTP-1-1-通用首部字段" class="headerlink" title="HTTP&#x2F;1.1 通用首部字段"></a>HTTP&#x2F;1.1 通用首部字段</h2><p>请求报文和响应报文双方都会使用的首部</p>
+<p><a name="Cache-Control"></a></p>
+<h3 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h3><p>指定首部字段 Cache-Control 的指令，就能操作缓存的工作机制。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705526419-0804d6bc-0795-470d-8457-8396bd367ce4.png#align=left&display=inline&height=292&originHeight=292&originWidth=725&size=144848&status=done&style=none&width=725" alt="image.png"></p>
+<p>指令的参数是可选的，多个指令之间通过“,”分隔。首部字段 Cache-Control 的指令可用于请求及响应时。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: private, max-age=0, no-cache</span><br></pre></td></tr></table></figure>
+
+<p>缓存请求指令<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705536338-f05ab521-0f3e-4272-ab7f-a0efd90ce570.png#align=left&display=inline&height=436&originHeight=436&originWidth=782&size=119140&status=done&style=none&width=782" alt="image.png"></p>
+<p>缓存响应指令<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705545675-e0fe3910-6ccc-4f3f-8fbf-5b19cc8fd41d.png#align=left&display=inline&height=504&originHeight=504&originWidth=987&size=259161&status=done&style=none&width=987" alt="image.png"></p>
+<p><a name="dc502bb1"></a></p>
+<h4 id="是否能缓存的指令"><a href="#是否能缓存的指令" class="headerlink" title="是否能缓存的指令"></a>是否能缓存的指令</h4><p><a name="342bdeab"></a></p>
+<h5 id="public-指令"><a href="#public-指令" class="headerlink" title="public 指令"></a>public 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: public</span><br></pre></td></tr></table></figure>
+
+<p>当指定使用 public 指令时，则明确表明其他用户也可利用缓存。</p>
+<p><a name="93bce3b6"></a></p>
+<h5 id="private-指令"><a href="#private-指令" class="headerlink" title="private 指令"></a>private 指令</h5><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705554206-e95eac1f-4480-4496-b514-187b586fa3a6.png#align=left&display=inline&height=263&originHeight=263&originWidth=802&size=147116&status=done&style=none&width=802" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: private</span><br></pre></td></tr></table></figure>
+
+<p>当指定 private 指令后，响应只以特定的用户作为对象，这与 public指令的行为相反</p>
+<p>缓存服务器会对该特定用户提供资源缓存的服务，对于其他用户发送过来的请求，代理服务器则不会返回缓存</p>
+<p><a name="83e54a93"></a></p>
+<h5 id="no-cache-指令"><a href="#no-cache-指令" class="headerlink" title="no-cache 指令"></a>no-cache 指令</h5><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705562301-4e31e6f9-ea66-4180-acef-ad17fffb9453.png#align=left&display=inline&height=323&originHeight=323&originWidth=735&size=168058&status=done&style=none&width=735" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: no-cache</span><br></pre></td></tr></table></figure>
+
+<p>使用 no-cache 指令的目的是为了防止从缓存中返回过期的资源。</p>
+<p>客户端发送的请求中如果包含no-cache指令，则表示客户端将不会接收缓存过的响应。于是，“中间”的缓存服务器必须把客户端请求转发给源服务器。</p>
+<p>如果服务器返回的响应中包含no-cache指令，那么缓存服务器不能对资源进行缓存。源服务器以后也将不再对缓存服务器请求中提出的资源有效性进行确认，且禁止其对响应资源进行缓存操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: no-cache=Location</span><br></pre></td></tr></table></figure>
+
+<p>若报文首部字段 Cache-Control中对no-cache字段名具体指定参数值，那么客户端在接收到这个被指定参数值的首部字段对应的响应报文后，就不能使用缓存。</p>
+<p>换言之，无参数值的首部字段可以使用缓存。只能在响应指令中指定该参数。</p>
+<p><a name="b26f1266"></a></p>
+<h4 id="控制可执行缓存的对象的指令"><a href="#控制可执行缓存的对象的指令" class="headerlink" title="控制可执行缓存的对象的指令"></a>控制可执行缓存的对象的指令</h4><p><a name="f8ff2250"></a></p>
+<h5 id="no-store-指令"><a href="#no-store-指令" class="headerlink" title="no-store 指令"></a>no-store 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: no-store</span><br></pre></td></tr></table></figure>
+
+<p>当使用 no-store 指令时，暗示请求（和对应的响应）或响应中包含机密信息。</p>
+<blockquote>
+<p>从字面意思上很容易把 no-cache 误解成为不缓存，但事实上 no-cache 代表不缓 存过期的资源，缓存会向源服务器进行有效期确认后处理资源，也许称为 do-not- serve-from-cache-without-revalidation更合适。no-store才是真正地不进行缓存</p>
+</blockquote>
+<p><a name="5b043e59"></a></p>
+<h4 id="指定缓存期限和认证的指令"><a href="#指定缓存期限和认证的指令" class="headerlink" title="指定缓存期限和认证的指令"></a>指定缓存期限和认证的指令</h4><p><a name="0a1e1901"></a></p>
+<h5 id="s-maxage-指令"><a href="#s-maxage-指令" class="headerlink" title="s-maxage 指令"></a>s-maxage 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: s-maxage=604800（单位 ：秒）</span><br></pre></td></tr></table></figure>
+
+<p>s-maxage 指令的功能和max-age指令的相同，它们的不同点是s-maxage指令只适用于供多位用户使用的公共缓存服务器</p>
+<p><strong>对于向同一用户重复返回响应的服务器来说，这个指令没有任何作用。</strong></p>
+<p><strong>当使用s-maxage指令后，则直接忽略对Expires首部字段及max-age指令的处理。</strong></p>
+<p><a name="01ac0444"></a></p>
+<h5 id="max-age-指令"><a href="#max-age-指令" class="headerlink" title="max-age 指令"></a>max-age 指令</h5><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705572218-8f86eaf1-6e2f-4c05-8b1a-06f6bfb14af9.png#align=left&display=inline&height=340&originHeight=340&originWidth=716&size=158815&status=done&style=none&width=716" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: max-age=604800（单位：秒）</span><br></pre></td></tr></table></figure>
+
+<p>当客户端发送的请求中包含max-age指令时，如果判定缓存资源的缓存时间数值比指定时间的数值更小，那么客户端就接收缓存的资源。另外，当指定max-age值为0，那么缓存服务器通常需要将请求转发给源服务器</p>
+<p>当服务器返回的响应中包含max-age指令时，缓存服务器将不对资源的有效性再作确认，而 max-age 数值代表资源保存为缓存的最长���间。</p>
+<ul>
+<li>应用 HTTP&#x2F;1.1 版本的缓存服务器遇到同时存在 Expires 首部字段的情 况时，会优先处理 max-age 指令，而忽略掉 Expires 首部字段。</li>
+<li>HTTP&#x2F;1.0 版本的缓存服务器的情况却相反，max-age 指令会被忽略掉。</li>
+</ul>
+<p><a name="f7c7a55f"></a></p>
+<h5 id="min-fresh-指令"><a href="#min-fresh-指令" class="headerlink" title="min-fresh 指令"></a>min-fresh 指令</h5><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705580811-2f492070-b819-4436-9601-270c52c05700.png#align=left&display=inline&height=479&originHeight=479&originWidth=743&size=219079&status=done&style=none&width=743" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: min-fresh=60（单位：秒）</span><br></pre></td></tr></table></figure>
+
+<p>min-fresh 指令要求缓存服务器返回至少还未过指定时间的缓存资源</p>
+<p><a name="2d0ac8db"></a></p>
+<h5 id="max-stale-指令"><a href="#max-stale-指令" class="headerlink" title="max-stale 指令"></a>max-stale 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: max-stale=3600（单位：秒）</span><br></pre></td></tr></table></figure>
+
+<p>使用 max-stale 可指示缓存资源，即使过期也照常接收。</p>
+<ul>
+<li>如果指令未指定参数值，那么无论经过多久，客户端都会接收响应；</li>
+<li>如果指令中指定了具体数值，那么即使过期，只要仍处于max-stale指定的时间内，仍旧会被客户端接收</li>
+</ul>
+<p><a name="e743078a"></a></p>
+<h5 id="only-if-cached-指令"><a href="#only-if-cached-指令" class="headerlink" title="only-if-cached 指令"></a>only-if-cached 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: only-if-cached</span><br></pre></td></tr></table></figure>
+
+<p>使用 only-if-cached 指令表示客户端仅在缓存服务器本地缓存目标资源的情况下才会要求其返回。</p>
+<p><strong>该指令要求缓存服务器不重新加载响应，也不会再次确认资源有效性。若发生请求缓存服务器的本地缓存无响应，则返回状态码 504 Gateway Timeout。</strong></p>
+<p><a name="8150234f"></a></p>
+<h5 id="must-revalidate-指令"><a href="#must-revalidate-指令" class="headerlink" title="must-revalidate 指令"></a>must-revalidate 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: must-revalidate</span><br></pre></td></tr></table></figure>
+
+<p>使用must-revalidate指令，代理会向源服务器再次验证即将返回的响应缓存目前是否仍然有效。</p>
+<p>若代理无法连通源服务器再次获取有效资源的话，缓存必须给客户端一条504（Gateway Timeout）状态码。</p>
+<p>另外，使用 must-revalidate 指令会忽略请求的 max-stale 指令（即使已 经在首部使用了 max-stale，也不会再有效果）。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705595282-e3b80154-3817-4000-999b-5a22b5b326f7.png#align=left&display=inline&height=780&originHeight=780&originWidth=677&size=122058&status=done&style=none&width=677" alt="image.png"></p>
+<p><a name="4cfc4df5"></a></p>
+<h5 id="proxy-revalidate-指令"><a href="#proxy-revalidate-指令" class="headerlink" title="proxy-revalidate 指令"></a>proxy-revalidate 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: proxy-revalidate</span><br></pre></td></tr></table></figure>
+
+<p>proxy-revalidate指令要求所有的缓存服务器在接收到客户端带有该指令的请求返回响应之前，必须再次验证缓存的有效性。</p>
+<p><a name="337fce37"></a></p>
+<h5 id="no-transform-指令"><a href="#no-transform-指令" class="headerlink" title="no-transform 指令"></a>no-transform 指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: no-transform</span><br></pre></td></tr></table></figure>
+
+<p>使用 no-transform 指令规定无论是在请求还是响应中，缓存都不能改变实体主体的媒体类型。</p>
+<p>这样做可防止缓存或代理压缩图片等类似操作</p>
+<p><a name="d04ceaf0"></a></p>
+<h3 id="Cache-Control-扩展"><a href="#Cache-Control-扩展" class="headerlink" title="Cache-Control 扩展"></a>Cache-Control 扩展</h3><p><a name="227921ae"></a></p>
+<h4 id="cache-extension-token"><a href="#cache-extension-token" class="headerlink" title="cache-extension token"></a>cache-extension token</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: private, community=&quot;UCI&quot;</span><br></pre></td></tr></table></figure>
+
+<p>通过 cache-extension 标记（token），可以扩展 Cache-Control 首部字 段内的指令。</p>
+<p><a name="Connection"></a></p>
+<h3 id="Connection"><a href="#Connection" class="headerlink" title="Connection"></a>Connection</h3><p>Connection 首部字段具备如下两个作用</p>
+<ul>
+<li>控制不再转发给代理的首部字段</li>
+<li>管理持久连接</li>
+</ul>
+<p><a name="c08ce813"></a></p>
+<h4 id="控制不再转发给代理的首部字段"><a href="#控制不再转发给代理的首部字段" class="headerlink" title="控制不再转发给代理的首部字段"></a>控制不再转发给代理的首部字段</h4><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705604973-ec81f365-85a7-4ef1-806a-9d59f55d38e1.png#align=left&display=inline&height=303&originHeight=303&originWidth=730&size=185073&status=done&style=none&width=730" alt="image.png"></p>
+<p>在客户端发送请求和服务器返回响应内，使用 Connection 首部字 段，可控制不再转发给代理的首部字段</p>
+<p><a name="81cf69e3"></a></p>
+<h4 id="管理持久连接"><a href="#管理持久连接" class="headerlink" title="管理持久连接"></a>管理持久连接</h4><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705613210-aa1ddb85-8588-43ee-9df4-afceddf46956.png#align=left&display=inline&height=364&originHeight=364&originWidth=750&size=163436&status=done&style=none&width=750" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Connection: close</span><br></pre></td></tr></table></figure>
+
+<p>HTTP&#x2F;1.1 版本的默认连接都是持久连接。为此，客户端会在持久连接上连续发送请求。当服务器端想明确断开连接时，则指定 Connection 首部字段的值为 Close。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705620736-266b5f07-1892-4293-adf5-0ef01af4053b.png#align=left&display=inline&height=326&originHeight=326&originWidth=738&size=190774&status=done&style=none&width=738" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Connection: Keep-Alive</span><br></pre></td></tr></table></figure>
+
+<p>HTTP&#x2F;1.1 之前的HTTP版本的默认连接都是非持久连接。为此，如果想在旧版本的 HTTP 协议上维持持续连接，则需要指定 Connection 首部字段的值为 Keep-Alive。</p>
+<p><a name="Date"></a></p>
+<h3 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h3><p>首部字段 Date 表明创建 HTTP 报文的日期和时间。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705636054-a6cdfb09-d1eb-4ebe-b9b5-d89effbc6d76.png#align=left&display=inline&height=316&originHeight=316&originWidth=738&size=130925&status=done&style=none&width=738" alt="image.png"></p>
+<ul>
+<li>HTTP&#x2F;1.1 协议使用在 RFC1123 中规定的日期时间的格式</li>
+<li>之前的 HTTP 协议版本中使用在 RFC850 中定义的格式</li>
+</ul>
+<p><a name="Pragma"></a></p>
+<h3 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h3><p>HTTP&#x2F;1.1 之前版本的历史遗留字段，仅作为与 HTTP&#x2F;1.0 的向后兼容而定义。</p>
+<p>规范定义的形式唯一</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Pragma: no-cache</span><br></pre></td></tr></table></figure>
+
+<p>该首部字段属于通用首部字段，但只用在客户端发送的请求中。客户端会要求所有的中间服务器不返回缓存的资源</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705647878-5c951d15-39f6-4367-8d7e-fefbc97ec681.png#align=left&display=inline&height=299&originHeight=299&originWidth=705&size=147168&status=done&style=none&width=705" alt="image.png"><br>所有的中间服务器如果都能以 HTTP&#x2F;1.1 为基准，那直接采用 Cache- Control: no-cache 指定缓存的处理方式是最为理想的。但要整体掌握全部中间服务器使用的HTTP协议版本却是不现实的。因此，发送的请求会同时含有下面两个首部字段。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: no-cache </span><br><span class="line">Pragma: no-cache</span><br></pre></td></tr></table></figure>
+
+<p><a name="Trailer"></a></p>
+<h3 id="Trailer"><a href="#Trailer" class="headerlink" title="Trailer"></a>Trailer</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705659334-9a192781-c126-48ec-a980-e39509dfac59.png#align=left&display=inline&height=303&originHeight=303&originWidth=701&size=180350&status=done&style=none&width=701" alt="image.png"><br>事先说明在报文主体后记录了哪些首部字段,该首部字段可应用在HTTP&#x2F;1.1版本分块传输编码时。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK </span><br><span class="line">Date: Tue, 03 Jul 2012 04:40:56 GMT </span><br><span class="line">Content-Type: text/html </span><br><span class="line">... </span><br><span class="line">Transfer-Encoding: chunked Trailer: Expires </span><br><span class="line">...(报文主体)... </span><br><span class="line">0</span><br><span class="line">Expires: Tue, 28 Sep 2004 23:59:59 GMT</span><br></pre></td></tr></table></figure>
+
+<p><a name="Transfer-Encoding"></a></p>
+<h3 id="Transfer-Encoding"><a href="#Transfer-Encoding" class="headerlink" title="Transfer-Encoding"></a>Transfer-Encoding</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705707980-c8b6312a-236f-42f3-9589-ca1fbd770efb.png#align=left&display=inline&height=302&originHeight=302&originWidth=706&size=180661&status=done&style=none&width=706" alt="image.png"><br>规定了传输报文主体时采用的编码方式</p>
+<p>HTTP&#x2F;1.1 的传输编码方式仅对分块传输编码有效。</p>
+<p><a name="Upgrade"></a></p>
+<h3 id="Upgrade"><a href="#Upgrade" class="headerlink" title="Upgrade"></a>Upgrade</h3><p>用于检测 HTTP 协议及其他协议是否可使用更高的版本进行通信，其参数值可以用来指定一个完全不同的通信协议。<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705718803-1565b00a-372f-433b-b320-44799e87cb3e.png#align=left&display=inline&height=280&originHeight=280&originWidth=708&size=220596&status=done&style=none&width=708" alt="image.png"><br>首部字段 Upgrade 指定的值为 TLS&#x2F;1.0。Upgrade 首部字段产生作用的 Upgrade 对象仅限于客户端和邻接服务器之间。因此，使用首部字段Upgrade时，还需要额外指定 Connection:Upgrade。</p>
+<p><a name="Via"></a></p>
+<h3 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h3><p>追踪客户端与服务器之间的请求和响应报文的传输路径。报文经过代理或网关时，会先在首部字段 Via 中附加该服务器的信息，然后再进行转发。</p>
+<p>首部字段Via不仅用于追踪报文的转发，还可避免请求回环的发生。所以必须在经过代理时附加该首部字段内容<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705733035-c79de63a-7675-43ac-9ed3-8a53a6f28dcb.png#align=left&display=inline&height=418&originHeight=418&originWidth=704&size=242033&status=done&style=none&width=704" alt="image.png"><br>Via 首部是为了追踪传输路径，所以经常会和 TRACE 方法一起使 用。</p>
+<p><a name="Warning"></a></p>
+<h3 id="Warning"><a href="#Warning" class="headerlink" title="Warning"></a>Warning</h3><p>HTTP&#x2F;1.1 的 Warning 首部是从 HTTP&#x2F;1.0 的响应首部（Retry-After）演 变过来的。该首部通常会告知用户一些与缓存相关的问题的警告。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Warning: [警告码][警告的主机:端口号]“[警告内容]”([日期时间])</span><br></pre></td></tr></table></figure>
+
+<p>HTTP&#x2F;1.1 中定义了 7 种警告<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705745357-3f93d803-9bda-4e97-bea0-5c71beb68864.png#align=left&display=inline&height=499&originHeight=499&originWidth=995&size=301381&status=done&style=none&width=995" alt="image.png"></p>
+<p><a name="77a3e006"></a></p>
+<h2 id="请求首部字段"><a href="#请求首部字段" class="headerlink" title="请求首部字段"></a>请求首部字段</h2><p>请求首部字段是从客户端往服务器端发送请求报文中所使用的字段，用于补充请求的附加信息、客户端信息、对响应内容相关的优先级等内容<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705753971-0c638066-068d-4e2a-9d72-b399c731008b.png#align=left&display=inline&height=282&originHeight=282&originWidth=718&size=152229&status=done&style=none&width=718" alt="image.png"></p>
+<p><a name="Accept"></a></p>
+<h3 id="Accept"><a href="#Accept" class="headerlink" title="Accept"></a>Accept</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705762705-9910b472-96a8-4b92-b27c-0dd5e7b9a0c6.png#align=left&display=inline&height=290&originHeight=290&originWidth=705&size=163896&status=done&style=none&width=705" alt="image.png"><br>Accept 首部字段可通知服务器，用户代理能够处理的媒体类型及媒体类型的相对优先级。可使用 type&#x2F;subtype 这种形式，一次指定多种媒体类型。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 文本文件 </span><br><span class="line">text/html, text/plain, text/css ... application/xhtml+xml, application/xml ...</span><br><span class="line"></span><br><span class="line">// 图片文件 </span><br><span class="line">image/jpeg, image/gif, image/png ... </span><br><span class="line"></span><br><span class="line">// 视频文件 </span><br><span class="line">video/mpeg, video/quicktime ... </span><br><span class="line"></span><br><span class="line">// 应用程序使用的二进制文件 </span><br><span class="line">application/octet-stream, application/zip ...</span><br></pre></td></tr></table></figure>
+
+<p>若想要给显示的媒体类型增加优先级，则使用q&#x3D;来额外表示权重值 1，用分号（;）进行分隔。权重值 q 的范围是0~1（可精确到小数点后3 位），且 1 为最大值。不指定权重q值时，默认权重为q&#x3D;1.0。</p>
+<p><a name="Accept-Charset"></a></p>
+<h3 id="Accept-Charset"><a href="#Accept-Charset" class="headerlink" title="Accept-Charset"></a>Accept-Charset</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705773941-581ef6bb-6f50-4d66-8f53-d4981bf76a1c.png#align=left&display=inline&height=332&originHeight=332&originWidth=694&size=171074&status=done&style=none&width=694" alt="image.png"><br>Accept-Charset 首部字段可用来通知服务器用户代理支持的字符集及字符集的相对优先顺序。另外，可一次性指定多种字符集。与首部字段Accept相同的是可用权重 q 值来表示相对优先级。</p>
+<p><a name="Accept-Encoding"></a></p>
+<h3 id="Accept-Encoding"><a href="#Accept-Encoding" class="headerlink" title="Accept-Encoding"></a>Accept-Encoding</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705781191-6b199277-4e6a-49b7-b1fe-8f8e0cd2f9d2.png#align=left&display=inline&height=395&originHeight=395&originWidth=714&size=210989&status=done&style=none&width=714" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Accept-Encoding: gzip, deflate</span><br></pre></td></tr></table></figure>
+
+<p>Accept-Encoding 首部字段用来告知服务器用户代理支持的内容编码及内容编码的优先级顺序。可一次性指定多种内容编码。</p>
+<p>内容编码</p>
+<ul>
+<li>gzip<ul>
+<li>由文件压缩程序 gzip（GNU zip）生成的编码格式</li>
+<li>采用 Lempel-Ziv 算法（LZ77）及 32 位循环冗余 校验（Cyclic Redundancy Check，通称 CRC）。</li>
+</ul>
+</li>
+<li>compress<ul>
+<li>由 UNIX 文件压缩程序 compress 生成的编码格式</li>
+<li>采用 Lempel- Ziv-Welch 算法（LZW）。</li>
+</ul>
+</li>
+<li>deflate<ul>
+<li>组合使用 zlib 格式（RFC1950）</li>
+<li>由 deflate 压缩算法 （RFC1951）生成的编码格式</li>
+</ul>
+</li>
+<li>identity<ul>
+<li>不执行压缩或不会变化的默认编码格式</li>
+</ul>
+</li>
+</ul>
+<p><a name="Accept-Language"></a></p>
+<h3 id="Accept-Language"><a href="#Accept-Language" class="headerlink" title="Accept-Language"></a>Accept-Language</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705791264-2999083d-e513-45f4-970d-2261d4ef6d6a.png#align=left&display=inline&height=552&originHeight=552&originWidth=715&size=263935&status=done&style=none&width=715" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Accept-Language: zh-cn,zh;q=0.7,en-us,en;q=0.3</span><br></pre></td></tr></table></figure>
+
+<p>首部字段Accept-Language用来告知服务器用户代理能够处理的自然语言集（指中文或英文等），以及自然语言集的相对优先级。可一次指定多种自然语言集</p>
+<p><a name="Authorization"></a></p>
+<h3 id="Authorization"><a href="#Authorization" class="headerlink" title="Authorization"></a>Authorization</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705800819-0701350d-f724-4dde-93d7-f701f816fd2a.png#align=left&display=inline&height=618&originHeight=618&originWidth=743&size=305865&status=done&style=none&width=743" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Authorization: Basic dWVub3NlbjpwYXNzd29yZA==</span><br></pre></td></tr></table></figure>
+
+<p>首部字段Authorization是用来告知服务器，用户代理的认证信息（证书值）。通常，想要通过服务器认证的用户代理会在接收到返回的401状态码响应后，把首部字段 Authorization 加入请求中。共用缓存在接收到含有Authorization首部字段的请求时的操作处理会略有差异。</p>
+<p><a name="Expect"></a></p>
+<h3 id="Expect"><a href="#Expect" class="headerlink" title="Expect"></a>Expect</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705808212-dea5750c-3fac-4ffc-8a8e-b339e37f7c5c.png#align=left&display=inline&height=324&originHeight=324&originWidth=753&size=209106&status=done&style=none&width=753" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Expect: 100-continue</span><br></pre></td></tr></table></figure>
+
+<p>客户端使用首部字段Expect来告知服务器，期望出现的某种特定行为。因服务器无法理解客户端的期望作出回应而发生错误时，会返回状态码 417 Expectation Failed。</p>
+<p>客户端可以利用该首部字段，写明所期望的扩展。</p>
+<p><a name="From"></a></p>
+<h3 id="From"><a href="#From" class="headerlink" title="From"></a>From</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705818351-de2c7127-e7fb-4ece-8aed-99084e642af7.png#align=left&display=inline&height=352&originHeight=352&originWidth=696&size=154928&status=done&style=none&width=696" alt="image.png"><br>首部字段From用来告知服务器使用用户代理的用户的电子邮件地址。</p>
+<p>通常，其使用目的就是为了显示搜索引擎等用户代理的负责人的电子邮件联系方式。使用代理时，应尽可能包含From首部字段（但可能会因代理不同，将电子邮件地址记录在 User-Agent 首部字段内）。</p>
+<p><a name="Host"></a></p>
+<h3 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705831499-59af6b8d-e5db-4ea7-b01d-36e9da732f33.png#align=left&display=inline&height=362&originHeight=362&originWidth=715&size=205119&status=done&style=none&width=715" alt="image.png"><br>虚拟主机运行在同一个 IP 上，因此使用首部字段Host加以区分。首部字段 Host 会告知服务器，请求的资源所处的互联网主机名和端口号。Host 首部字段在 HTTP&#x2F;1.1 规范内是唯一一个必须被包含在请求内的首部字段。</p>
+<p><a name="If-Match"></a></p>
+<h3 id="If-Match"><a href="#If-Match" class="headerlink" title="If-Match"></a>If-Match</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705841483-71a7c5d2-ee69-47cf-98ec-a46922a7d072.png#align=left&display=inline&height=348&originHeight=348&originWidth=696&size=178429&status=done&style=none&width=696" alt="image.png"><br>形如 If-xxx 这种样式的请求首部字段，都可称为条件请求。服务器接收到附带条件的请求后，只有判断指定条件为真时，才会执行请求。<br></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705856530-0822a3ee-e885-4240-8d20-9de7ca065905.png#align=left&display=inline&height=579&originHeight=579&originWidth=705&size=318688&status=done&style=none&width=705" alt="image.png"><br>只有当 If-Match 的字段值跟 ETag 值匹配一致时，服务器才会接受请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">If-Match: &quot;123456&quot;</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 If-Match，属附带条件之一，它会告知服务器匹配资源所用的实体标记（ETag）值。</p>
+<p>还可以使用星号（*）指定 If-Match 的字段值。针对这种情况，服务 器将会忽略 ETag 的值，只要资源存在就处理请求。</p>
+<p><a name="If-Modified-Since"></a></p>
+<h3 id="If-Modified-Since"><a href="#If-Modified-Since" class="headerlink" title="If-Modified-Since"></a>If-Modified-Since</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705866235-fdd01b9b-7def-49d7-924e-98e6ba75f155.png#align=left&display=inline&height=605&originHeight=605&originWidth=748&size=338414&status=done&style=none&width=748" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">If-Modified-Since: Thu, 15 Apr 2004 00:00:00 GMT</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 If-Modified-Since，属附带条件之一，它会告知服务器若If-Modified-Since字段值早于资源的更新时间，则希望能处理该请求。 而在指定If-Modified-Since 字段值的日期时间之后，如果请求的资源 都没有过更新，则返回状态码 304 Not Modified 的响应</p>
+<p><a name="If-None-Match"></a></p>
+<h3 id="If-None-Match"><a href="#If-None-Match" class="headerlink" title="If-None-Match"></a>If-None-Match</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705876640-f3b03088-f2c7-4691-adfe-41b49c84499f.png#align=left&display=inline&height=269&originHeight=269&originWidth=701&size=154679&status=done&style=none&width=701" alt="image.png"><br>首部字段 If-None-Match属于附带条件之一。它和首部字段If-Match作用相反。用于指定 If-None-Match 字段值的实体标记（ETag）值与请求资源的ETag不一致时，它就告知服务器处理该请求。</p>
+<p><a name="If-Range"></a></p>
+<h3 id="If-Range"><a href="#If-Range" class="headerlink" title="If-Range"></a>If-Range</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705889672-9d213e47-7dfa-4472-b2a3-b8e69459f304.png#align=left&display=inline&height=683&originHeight=683&originWidth=718&size=402983&status=done&style=none&width=718" alt="image.png"><br>首部字段 If-Range 属于附带条件之一。它告知服务器若指定的If-Range字段值（ETag 值或者时间）和请求资源的ETag值或时间相一致时，则作为范围请求处理。反之，则返回全体资源</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705900796-a63dded7-b0ff-4ae8-bee5-80008a6f0587.png#align=left&display=inline&height=534&originHeight=534&originWidth=740&size=283524&status=done&style=none&width=740" alt="image.png"></p>
+<p><a name="If-Unmodified-Since"></a></p>
+<h3 id="If-Unmodified-Since"><a href="#If-Unmodified-Since" class="headerlink" title="If-Unmodified-Since"></a>If-Unmodified-Since</h3><p>首部字段 If-Unmodified-Since 和首部字段 If-Modified-Since 的作用相 反。它的作用的是告知服务器，指定的请求资源只有在字段值内指定 的日期时间之后，未发生更新的情况下，才能处理请求。</p>
+<p><a name="Max-Forwards"></a></p>
+<h3 id="Max-Forwards"><a href="#Max-Forwards" class="headerlink" title="Max-Forwards"></a>Max-Forwards</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705909749-c5c8c21b-8c52-4cc7-9143-a9a9b737fc0a.png#align=left&display=inline&height=287&originHeight=287&originWidth=698&size=189559&status=done&style=none&width=698" alt="image.png"><br>每次转发数值减 1。当数值变 0 时返回响应</p>
+<p>通过 TRACE 方法或 OPTIONS方法，发送包含首部字段Max-Forwards的请求时，该字段以十进制整数形式指定可经过的服务器最大数目。服务器在往下一个服务器转发请求之前，Max-Forwards的值减1后重新赋值。当服务器接收到 Max-Forwards 值为 0 的请求 时，则不再进行转发，而是直接返回响应</p>
+<p>使用 HTTP 协议通信时，请求可能会经过代理等多台服务器。途中，如果代理服务器由于某些原因导致请求转发失败，客户端也就等不到服务器返回的响应了。对此，我们无从可知。</p>
+<p>可以灵活使用首部字段 Max-Forwards，针对以上问题产生的原因展 开调查。由于当 Max-Forwards 字段值为0时，服务器就会立即返回响应，由此我们至少可以对以那台服务器为终点的传输路径的通信状 况有所把握。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705925304-24bca26b-132f-45ff-8f34-f3c63cc62f09.png#align=left&display=inline&height=234&originHeight=234&originWidth=743&size=147542&status=done&style=none&width=743" alt="image.png"></p>
+<p><a name="Proxy-Authorization"></a></p>
+<h3 id="Proxy-Authorization"><a href="#Proxy-Authorization" class="headerlink" title="Proxy-Authorization"></a>Proxy-Authorization</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Proxy-Authorization: Basic dGlwOjkpNLAGfFY5</span><br></pre></td></tr></table></figure>
+
+<p>接收到从代理服务器发来的认证质询时，客户端会发送包含首部字段Proxy-Authorization 的请求，以告知服务器认证所需要的信息。</p>
+<p>这个行为是与客户端和服务器之间的HTTP访问认证相类似的，不同之处在于，认证行为发生在客户端与代理之间。客户端与服务器之间 的认证，使用首部字段Authorization 可起到相同作用。</p>
+<p><a name="Range"></a></p>
+<h3 id="Range"><a href="#Range" class="headerlink" title="Range"></a>Range</h3><p>对于只需获取部分资源的范围请求，包含首部字段Range即可告知服务器资源的指定范围。</p>
+<p><a name="Referer"></a></p>
+<h3 id="Referer"><a href="#Referer" class="headerlink" title="Referer"></a>Referer</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705933648-685707fd-22b6-49eb-a4ff-36bb9a210208.png#align=left&display=inline&height=300&originHeight=300&originWidth=753&size=135756&status=done&style=none&width=753" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Referer: http://www.hackr.jp/index.htm</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Referer 会告知服务器请求的原始资源的 URI。</p>
+<p>客户端一般都会发送 Referer 首部字段给服务器。但当直接在浏览器的地址栏输入 URI，或出于安全性的考虑时，也可以不发送该首部字段</p>
+<p><strong>另外，Referer 的正确的拼写应该是 Referrer，但不知为何，大家一直 沿用这个错误的拼写</strong></p>
+<p><a name="TE"></a></p>
+<h3 id="TE"><a href="#TE" class="headerlink" title="TE"></a>TE</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TE: gzip, deflate;q=0.5</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 TE 会告知服务器客户端能够处理响应的传输编码方式及相对优先级。它和首部字段 Accept-Encoding 的功能很相像，但是用于传输编码。</p>
+<p>首部字段 TE 除指定传输编码之外，还可以指定伴随 trailer 字段的分 块传输编码的方式。应用后者时，只需把 trailers 赋值给该字段值。</p>
+<p><a name="User-Agent"></a></p>
+<h3 id="User-Agent"><a href="#User-Agent" class="headerlink" title="User-Agent"></a>User-Agent</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705946716-8d397a25-23d1-4630-a781-fa7fbd96351c.png#align=left&display=inline&height=584&originHeight=584&originWidth=546&size=143248&status=done&style=none&width=546" alt="image.png"><br>首部字段 User-Agent 会将创建请求的浏览器和用户代理名称等信息传 达给服务器。</p>
+<p><a name="b7f3c1e8"></a></p>
+<h2 id="响应首部字段"><a href="#响应首部字段" class="headerlink" title="响应首部字段"></a>响应首部字段</h2><p>响应首部字段是由服务器端向客户端返回响应报文中所使用的字段，用于补充响应的附加信息、服务器信息，以及对客户端的附加要求等信息。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705974726-226aec96-fe1d-47ea-8f43-cd3451ca1d11.png#align=left&display=inline&height=227&originHeight=227&originWidth=725&size=126831&status=done&style=none&width=725" alt="image.png"></p>
+<p><a name="Accept-Ranges"></a></p>
+<h3 id="Accept-Ranges"><a href="#Accept-Ranges" class="headerlink" title="Accept-Ranges"></a>Accept-Ranges</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705983977-fc957f21-7f7d-4f06-a89f-2bf52df0e4b5.png#align=left&display=inline&height=239&originHeight=239&originWidth=714&size=127908&status=done&style=none&width=714" alt="image.png"><br>首部字段 Accept-Ranges 是用来告知客户端服务器是否能处理范围请求，以指定获取服务器端某个部分的资源。</p>
+<p>可指定的字段值有两种：</p>
+<ul>
+<li>可处理范围请求时指定其为 bytes</li>
+<li>反之则 指定其为 none</li>
+</ul>
+<p><a name="Age"></a></p>
+<h3 id="Age"><a href="#Age" class="headerlink" title="Age"></a>Age</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610705992643-545b4ab0-a9fe-4d7d-b1a3-ede552e83d3c.png#align=left&display=inline&height=275&originHeight=275&originWidth=702&size=151314&status=done&style=none&width=702" alt="image.png"><br>首部字段 Age 能告知客户端，源服务器在多久前创建了响应。字段值的单位为秒</p>
+<p>若创建该响应的服务器是缓存服务器，Age值是指缓存后的响应再次发起认证到认证完成的时间值。代理创建响应时必须加上首部字段 Age。</p>
+<p><a name="ETag"></a></p>
+<h3 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706002845-cc73e159-8ff9-40a1-b1cb-2acba0011c22.png#align=left&display=inline&height=535&originHeight=535&originWidth=717&size=300826&status=done&style=none&width=717" alt="image.png"></p>
+<p>首部字段 ETag 能告知客户端实体标识。它是一种可将资源以字符串形式做唯一性标识的方式。服务器会为每份资源分配对应的 ETag 值。</p>
+<p>当资源更新时，ETag 值也需要更新。生成ETag值时，并没有统一的算法规则，而仅仅是由服务器来分配。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706012585-91d5efc6-ca1c-4dfd-b8fa-7e6bf9ccd2c3.png#align=left&display=inline&height=297&originHeight=297&originWidth=725&size=136053&status=done&style=none&width=725" alt="image.png"><br>资源被缓存时，就会被分配唯一性标识</p>
+<p><a name="5e327d52"></a></p>
+<h4 id="强-ETag-值和弱-Tag-值"><a href="#强-ETag-值和弱-Tag-值" class="headerlink" title="强 ETag 值和弱 Tag 值"></a>强 ETag 值和弱 Tag 值</h4><ul>
+<li>强 ETag 值<ul>
+<li>强 ETag 值，不论实体发生多么细微的变化都会改变其值</li>
+<li>ETag: “usagi-1234”</li>
+</ul>
+</li>
+<li>弱 ETag 值<ul>
+<li>弱 ETag 值只用于提示资源是否相同。</li>
+<li>只有资源发生了根本改变，产生差异时才会改变ETag值。在字段值最开始处附加 W&#x2F;。</li>
+<li>ETag: W&#x2F;“usagi-1234”</li>
+</ul>
+</li>
+</ul>
+<p><a name="Location"></a></p>
+<h3 id="Location"><a href="#Location" class="headerlink" title="Location"></a>Location</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706024270-ed52724e-4a11-48b8-b956-611e5bf53ef7.png#align=left&display=inline&height=630&originHeight=630&originWidth=755&size=354929&status=done&style=none&width=755" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Location: http://www.usagidesign.jp/sample.html</span><br></pre></td></tr></table></figure>
+
+<p>使用首部字段 Location 可以将响应接收方引导至某个与请求 URI 位置 不同的资源。</p>
+<p>基本上，该字段会配合 3xx ：Redirection 的响应，提供重定向的 URI。</p>
+<p>几乎所有的浏览器在接收到包含首部字段 Location 的响应后，都会强 制性地尝试对已提示的重定向资源的访问。</p>
+<p><a name="Proxy-Authenticate"></a></p>
+<h3 id="Proxy-Authenticate"><a href="#Proxy-Authenticate" class="headerlink" title="Proxy-Authenticate"></a>Proxy-Authenticate</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Proxy-Authenticate</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Proxy-Authenticate 会把由代理服务器所要求的认证信息发送给客户端。</p>
+<p>它与客户端和服务器之间的HTTP访问认证的行为相似，不同之处在于其认证行为是在客户端与代理之间进行的。</p>
+<p><a name="Retry-After"></a></p>
+<h3 id="Retry-After"><a href="#Retry-After" class="headerlink" title="Retry-After"></a>Retry-After</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706032527-7d4eea8e-0aa8-4d7e-9fc4-fb76e7bd09b3.png#align=left&display=inline&height=214&originHeight=214&originWidth=725&size=112707&status=done&style=none&width=725" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Retry-After: 120</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Retry-After 告知客户端应该在多久之后再次发送请求。</p>
+<p><a name="Server"></a></p>
+<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706040322-f1b78ac8-f56e-4c0e-a52a-36b492669dd4.png#align=left&display=inline&height=324&originHeight=324&originWidth=708&size=164394&status=done&style=none&width=708" alt="image.png"><br>首部字段 Server 告知客户端当前服务器上安装的HTTP服务器应用程序的信息。不单单会标出服务器上的软件应用名称，还有可能包括版本号和安装时启用的可选项。</p>
+<p><a name="Vary"></a></p>
+<h3 id="Vary"><a href="#Vary" class="headerlink" title="Vary"></a>Vary</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706050218-fb7c74a6-5ba7-4be6-b8e6-43bf3cf4f466.png#align=left&display=inline&height=368&originHeight=368&originWidth=704&size=226290&status=done&style=none&width=704" alt="image.png"><br>当代理服务器接收到带有Vary首部字段指定获取资源的请求时，如果使用的Accept-Language字段的值相同，那么就直接从缓存返回响应。反之，则需要先从源服务器端获取资源后才能作为响应返回</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vary: Accept-Language</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Vary 可对缓存进行控制。源服务器会向代理服务器传达关于本地缓存使用方法的命令。</p>
+<p>从代理服务器接收到源服务器返回包含Vary指定项的响应之后，若再要进行缓存，仅对请求中含有相同 Vary 指定首部字段的请求返回缓存。</p>
+<p>即使对相同资源发起请求，但由于Vary指定的首部字段不相同，因此必须要从源服务器重新获取资源</p>
+<p><a name="WWW-Authenticate"></a></p>
+<h3 id="WWW-Authenticate"><a href="#WWW-Authenticate" class="headerlink" title="WWW-Authenticate"></a>WWW-Authenticate</h3><p>首部字段 WWW-Authenticate 用于 HTTP 访问认证。它会告知客户端 适用于访问请求 URI 所指定资源的认证方案（Basic 或是 Digest）和带参数提示的质询（challenge）</p>
+<p><a name="56e4abe9"></a></p>
+<h2 id="实体首部字段"><a href="#实体首部字段" class="headerlink" title="实体首部字段"></a>实体首部字段</h2><p>实体首部字段是包含在请求报文和响应报文中的实体部分所使用的首部，用于补充内容的更新时间等与实体相关的信息<img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706058165-3d9878e8-8d4d-4c7f-ad97-c8a1e5539fa8.png#align=left&display=inline&height=211&originHeight=211&originWidth=713&size=133604&status=done&style=none&width=713" alt="image.png"></p>
+<p><a name="Allow"></a></p>
+<h3 id="Allow"><a href="#Allow" class="headerlink" title="Allow"></a>Allow</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706065257-ca45a391-6fc0-4993-b039-f9a409e9ee63.png#align=left&display=inline&height=215&originHeight=215&originWidth=723&size=137166&status=done&style=none&width=723" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Allow: GET, HEAD</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Allow 用于通知客户端能够支持 Request-URI 指定资源的所有HTTP方法</p>
+<p>当服务器接收到不支持的 HTTP 方法时，会以状态码 405 Method Not   Allowed作为响应返回。</p>
+<p><a name="Content-Encoding"></a></p>
+<h3 id="Content-Encoding"><a href="#Content-Encoding" class="headerlink" title="Content-Encoding"></a>Content-Encoding</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Encoding: gzip</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Content-Encoding会告知客户端服务器对实体的主体部分选用的内容编码方式。内容编码是指在不丢失实体信息的前提下所进行的压缩</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706072675-a0b11669-b7d1-4c86-b917-5c32aa6f46c2.png#align=left&display=inline&height=323&originHeight=323&originWidth=744&size=181512&status=done&style=none&width=744" alt="image.png"></p>
+<p><a name="Content-Language"></a></p>
+<h3 id="Content-Language"><a href="#Content-Language" class="headerlink" title="Content-Language"></a>Content-Language</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706078592-fe2dd83a-84a0-4e81-84a8-57db427b0ee8.png#align=left&display=inline&height=371&originHeight=371&originWidth=762&size=145097&status=done&style=none&width=762" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Language: zh-CN</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Content-Language 会告知客户端，实体主体使用的自然语言 （指中文或英文等语言）。</p>
+<p><a name="Content-Length"></a></p>
+<h3 id="Content-Length"><a href="#Content-Length" class="headerlink" title="Content-Length"></a>Content-Length</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706085375-f7b001bd-5973-41df-a018-ecc0a758dfe0.png#align=left&display=inline&height=316&originHeight=316&originWidth=743&size=153400&status=done&style=none&width=743" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Length: 15000</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Content-Length表明了实体主体部分的大小（单位是字节）。对实体主体进行内容编码传输时，不能再使用 Content-Length 首部字段。</p>
+<p><a name="Content-Location"></a></p>
+<h3 id="Content-Location"><a href="#Content-Location" class="headerlink" title="Content-Location"></a>Content-Location</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Location: http://www.hackr.jp/index-ja.html</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Content-Location 给出与报文主体部分相对应的 URI。和首 部字段 Location 不同，Content-Location 表示的是报文主体返回资源对应的 URI。</p>
+<p><a name="Content-MD5"></a></p>
+<h3 id="Content-MD5"><a href="#Content-MD5" class="headerlink" title="Content-MD5"></a>Content-MD5</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706094657-a042b242-8ddf-40ec-b38d-ed7d4aca5a75.png#align=left&display=inline&height=377&originHeight=377&originWidth=701&size=157546&status=done&style=none&width=701" alt="image.png"><br>客户端会对接收的报文主体执行相同的 MD5 算法，然后与首部字段 Content-MD5 的字段值比较</p>
+<p>目的在于检 查报文主体在传输过程中是否保持完整，以及确认传输到达。为确保报文的有效性，作为接 收方的客户端会对报文主体再执行一次相同的 MD5 算法。计算出的值与字段值作比较后，即可判断出报文主体的准确性。</p>
+<p>采用这种方法，对内容上的偶发性改变是无从查证的，也无法检测出恶意篡改。</p>
+<p><a name="Content-Range"></a></p>
+<h3 id="Content-Range"><a href="#Content-Range" class="headerlink" title="Content-Range"></a>Content-Range</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706103218-d60f62c2-b509-4a3a-b50c-ff7f3e7fee1e.png#align=left&display=inline&height=508&originHeight=508&originWidth=707&size=343470&status=done&style=none&width=707" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Range: bytes 5001-10000/10000</span><br></pre></td></tr></table></figure>
+
+<p>能告知客户端作为响应返回的实体的哪个部分符合范围请求。字段值以字节为单位，表示当前发送部分及整个实体大小</p>
+<p><a name="Content-Type"></a></p>
+<h3 id="Content-Type"><a href="#Content-Type" class="headerlink" title="Content-Type"></a>Content-Type</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: text/html; charset=UTF-8</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Content-Type 说明了实体主体内对象的媒体类型。和首部字段 Accept 一样，字段值用 type&#x2F;subtype 形式赋值。</p>
+<p><a name="Expires"></a></p>
+<h3 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706110853-9b73c91d-c798-4a28-8916-93710a331654.png#align=left&display=inline&height=221&originHeight=221&originWidth=702&size=108548&status=done&style=none&width=702" alt="image.png"><br>首部字段 Expires 会将资源失效的日期告知客户端。缓存服务器在接收到含有首部字段Expires的响应后，会以缓存来应答请求，在Expires字段值指定的时间之前，响应的副本会一直被保存。当超过指定的时间后，缓存服务器在请求发送过来时，会转向源服务器请求资源</p>
+<p>源服务器不希望缓存服务器对资源缓存时，最好在Expires字段内写入与首部字段 Date 相同的时间值。</p>
+<p><a name="Last-Modified"></a></p>
+<h3 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706118878-4c6f9d97-65c3-4af3-9421-6d14c50612ef.png#align=left&display=inline&height=218&originHeight=218&originWidth=687&size=129155&status=done&style=none&width=687" alt="image.png"><br>首部字段 Last-Modified 指明资源最终修改的时间。一般来说，这个值就是 Request-URI指定资源被修改的时间。但类似使用CGI脚本进行动态数据处理时，该值有可能会变成数据最终修改时的时间。</p>
+<p><a name="e3634a9d"></a></p>
+<h2 id="为-Cookie-服务的首部字段"><a href="#为-Cookie-服务的首部字段" class="headerlink" title="为 Cookie 服务的首部字段"></a>为 Cookie 服务的首部字段</h2><p>Cookie 的工作机制是用户识别及状态管理。</p>
+<p>调用Cookie时，由于可校验Cookie的有效期，以及发送方的域、路径、协议等信息，所以正规发布的 Cookie 内的数据不会因来自其他Web站点和攻击者的攻击而泄露。</p>
+<p>为 Cookie 服务的首部字段</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706130252-e54041b6-a2d7-43ca-922c-952a9566551a.png#align=left&display=inline&height=528&originHeight=528&originWidth=875&size=252041&status=done&style=none&width=875" alt="image.png"></p>
+<p><a name="Set-Cookie"></a></p>
+<h3 id="Set-Cookie"><a href="#Set-Cookie" class="headerlink" title="Set-Cookie"></a>Set-Cookie</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-Cookie: status=enable; expires=Tue, 05 Jul 2011 07:26:31</span><br></pre></td></tr></table></figure>
+
+<p>当服务器准备开始管理客户端的状态时，会事先告知各种信息。</p>
+<p>Set-Cookie 字段的属性<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706140780-ad43c067-386e-460f-9489-b80f2f085272.png#align=left&display=inline&height=387&originHeight=387&originWidth=986&size=227644&status=done&style=none&width=986" alt="image.png"></p>
+<p><a name="694b6730"></a></p>
+<h4 id="expires-属性"><a href="#expires-属性" class="headerlink" title="expires 属性"></a>expires 属性</h4><p>Cookie 的 expires 属性指定浏览器可发送 Cookie 的有效期。</p>
+<p>当省略 expires 属性时，其有效期仅限于维持浏览器会话（Session） 时间段内。这通常限于浏览器应用程序被关闭之前。</p>
+<p>另外，一旦 Cookie 从服务器端发送至客户端，服务器端就不存在可以显式删除 Cookie的方法。但可通过覆盖已过期的Cookie，实现对 客户端Cookie 的实质性删除操作。</p>
+<p><a name="77c8e395"></a></p>
+<h4 id="path-属性"><a href="#path-属性" class="headerlink" title="path 属性"></a>path 属性</h4><p>Cookie 的 path 属性可用于限制指定 Cookie 的发送范围的文件目录。 不过另有办法可避开这项限制，看来对其作为安全机制的效果不能抱有期待。</p>
+<p><a name="a314dc25"></a></p>
+<h4 id="domain-属性"><a href="#domain-属性" class="headerlink" title="domain 属性"></a>domain 属性</h4><p>通过 Cookie 的 domain 属性指定的域名可做到与结尾匹配一致。</p>
+<p><strong>当指定 example.com 后，除 example.com 以外，<a target="_blank" rel="noopener" href="http://www.example.com/">www.example.com</a> 或 www2.example.com 等都可以发送 Cookie。</strong></p>
+<p>因此，除了针对具体指定的多个域名发送 Cookie 之 外，不指定 domain 属性显得更安全</p>
+<p><a name="b7454802"></a></p>
+<h4 id="secure-属性"><a href="#secure-属性" class="headerlink" title="secure 属性"></a>secure 属性</h4><p>Cookie 的 secure 属性用于限制 Web 页面仅在 HTTPS 安全连接时，才 可以发送 Cookie。</p>
+<p><strong>当省略 secure 属性时，不论 HTTP 还是 HTTPS，都会对 Cookie 进行 回收。</strong></p>
+<p><a name="1959e2de"></a></p>
+<h4 id="HttpOnly-属性"><a href="#HttpOnly-属性" class="headerlink" title="HttpOnly 属性"></a>HttpOnly 属性</h4><p>Cookie 的 HttpOnly 属性是 Cookie 的扩展功能，它使 JavaScript 脚本 无法获得 Cookie。主要目的为防止跨站脚本攻击（Cross-site scripting，XSS）对 Cookie 的信息窃取。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-Cookie: name=value; HttpOnly</span><br></pre></td></tr></table></figure>
+
+<p>主流浏览器都已经支持该扩展了。另外顺带一提，该扩展并非是为了防止XSS 而开发的</p>
+<p><a name="Cookie"></a></p>
+<h3 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cookie: status=enable</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Cookie 会告知服务器，当客户端想获得HTTP状态管理支持时，就会在请求中包含从服务器接收到的Cookie。接收到多个Cookie时，同样可以以多个Cookie形式发送</p>
+<p><a name="06b11b2d"></a></p>
+<h2 id="其他首部字段"><a href="#其他首部字段" class="headerlink" title="其他首部字段"></a>其他首部字段</h2><p>HTTP 首部字段是可以自行扩展的。所以在Web服务器和浏览器的应用上，会出现各种非标准的首部字段。</p>
+<p><a name="X-Frame-Options"></a></p>
+<h3 id="X-Frame-Options"><a href="#X-Frame-Options" class="headerlink" title="X-Frame-Options"></a>X-Frame-Options</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-Frame-Options: DENY</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 X-Frame-Options 属于 HTTP 响应首部，用于控制网站内容 在其他 Web 网站的 Frame 标签内的显示问题。其主要目的是为了防止点击劫持（clickjacking）攻击</p>
+<ul>
+<li>DENY<ul>
+<li>拒绝</li>
+</ul>
+</li>
+<li>SAMEORIGIN<ul>
+<li>仅同源域名下的页面（Top-level-browsing- context）匹配时许可。</li>
+</ul>
+</li>
+</ul>
+<p><a name="X-XSS-Protection"></a></p>
+<h3 id="X-XSS-Protection"><a href="#X-XSS-Protection" class="headerlink" title="X-XSS-Protection"></a>X-XSS-Protection</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-XSS-Protection: 1</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 X-XSS-Protection属于HTTP响应首部，它是针对跨站脚本攻击（XSS）的一种对策，用于控制浏览器 XSS 防护机制的开关。</p>
+<ul>
+<li>0 ：将 XSS 过滤设置成无效状态</li>
+<li>1 ：将 XSS 过滤设置成有效状态</li>
+</ul>
+<p><a name="DNT"></a></p>
+<h3 id="DNT"><a href="#DNT" class="headerlink" title="DNT"></a>DNT</h3><p><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610706170293-d931111f-0825-4300-92c0-610f3ae01ebd.png#align=left&display=inline&height=214&originHeight=214&originWidth=749&size=121463&status=done&style=none&width=749" alt="image.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DNT: 1</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 DNT 属于 HTTP 请求首部，其中 DNT 是 Do Not Track 的简 称，意为拒绝个人信息被收集，是表示拒绝被精准广告追踪的一种方法</p>
+<ul>
+<li>0 ：同意被追踪</li>
+<li>1 ：拒绝被追踪</li>
+</ul>
+<p>由于首部字段 DNT 的功能具备有效性，所以 Web 服务器需要对 DNT 做对应的支持</p>
+<p><a name="P3P"></a></p>
+<h3 id="P3P"><a href="#P3P" class="headerlink" title="P3P"></a>P3P</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P3P: CP=&quot;CAO DSP LAW CURa ADMa DEVa TAIa PSAa PSDa IVAa IVDa OUR BUS IND UNI COM NAV INT&quot;</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 P3P 属于 HTTP 相应首部，通过利用 P3P（The Platform for Privacy Preferences，在线隐私偏好平台）技术，可以让Web网站上的个人隐私变成一种仅供程序可理解的形式，以达到保护用户隐私的目的</p>
+<p>步骤</p>
+<ul>
+<li>创建 P3P 隐私</li>
+<li>创建 P3P 隐私对照文件后，保存命名在 &#x2F;w3c&#x2F;p3p.xml</li>
+<li>从 P3P 隐私中新建 Compact policies 后，输出到 HTTP 响应 中</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Http/6.%20HTTP%20%E9%A6%96%E9%83%A8-uh5p8t-do7gaf/">https://ohyesc.github.io/2023/11/20/Http/6.%20HTTP%20%E9%A6%96%E9%83%A8-uh5p8t-do7gaf/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Http/">Http</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Http/5.%20%E4%B8%8E%20HTTP%20%E5%8D%8F%E4%BD%9C%E7%9A%84%20Web%20%E6%9C%8D%E5%8A%A1%E5%99%A8-uh5p8t-bzhd21/" title="5. 与 HTTP 协作的 Web 服务器"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">5. 与 HTTP 协作的 Web 服务器</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Http/7.%20%E7%A1%AE%E4%BF%9D%20Web%20%E5%AE%89%E5%85%A8%E7%9A%84%20HTTPS-uh5p8t-aioit7/" title="7. 确保 Web 安全的 HTTPS"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">7. 确保 Web 安全的 HTTPS</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Http/1.%20%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80-uh5p8t-cbiby7/" title="1. 网络基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 网络基础</div></div></a></div><div><a href="/2023/11/20/Http/2.%20%E7%AE%80%E5%8D%95HTTP%E5%8D%8F%E8%AE%AE-uh5p8t-zwmmog/" title="2. 简单HTTP协议"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">2. 简单HTTP协议</div></div></a></div><div><a href="/2023/11/20/Http/3.%20HTTP%20%E6%8A%A5%E6%96%87-uh5p8t-kss9oe/" title="3. HTTP 报文"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">3. HTTP 报文</div></div></a></div><div><a href="/2023/11/20/Http/4.%20%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C%E7%9A%84%20HTTP%20%E7%8A%B6%EF%BF%BD%EF%BF%BD%EF%BF%BD%E7%A0%81-uh5p8t-epqxm3/" title="4. 返回结果的 HTTP 状态码"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">4. 返回结果的 HTTP 状态码</div></div></a></div><div><a href="/2023/11/20/Http/5.%20%E4%B8%8E%20HTTP%20%E5%8D%8F%E4%BD%9C%E7%9A%84%20Web%20%E6%9C%8D%E5%8A%A1%E5%99%A8-uh5p8t-bzhd21/" title="5. 与 HTTP 协作的 Web 服务器"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">5. 与 HTTP 协作的 Web 服务器</div></div></a></div><div><a href="/2023/11/20/Http/7.%20%E7%A1%AE%E4%BF%9D%20Web%20%E5%AE%89%E5%85%A8%E7%9A%84%20HTTPS-uh5p8t-aioit7/" title="7. 确保 Web 安全的 HTTPS"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">7. 确保 Web 安全的 HTTPS</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-%E6%8A%A5%E6%96%87%E9%A6%96%E9%83%A8"><span class="toc-number">1.</span> <span class="toc-text">HTTP 报文首部</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87"><span class="toc-number">1.1.</span> <span class="toc-text">HTTP 请求报文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87"><span class="toc-number">1.2.</span> <span class="toc-text">HTTP 响应报文</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">2.</span> <span class="toc-text">HTTP 首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5%E4%BC%A0%E9%80%92%E9%87%8D%E8%A6%81%E4%BF%A1%E6%81%AF"><span class="toc-number">2.1.</span> <span class="toc-text">HTTP 首部字段传递重要信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.</span> <span class="toc-text">HTTP 首部字段结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8B%A5-HTTP-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5%E9%87%8D%E5%A4%8D%E4%BA%86%E4%BC%9A%E5%A6%82%E4%BD%95"><span class="toc-number">2.2.1.</span> <span class="toc-text">若 HTTP 首部字段重复了会如何</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%A7%8D-HTTP-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.3.</span> <span class="toc-text">4 种 HTTP 首部字段类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-1-1-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5%E4%B8%80%E8%A7%88"><span class="toc-number">2.4.</span> <span class="toc-text">HTTP&#x2F;1.1 首部字段一览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%9E-HTTP-1-1-%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">2.5.</span> <span class="toc-text">非 HTTP&#x2F;1.1 首部字段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#End-to-end-%E9%A6%96%E9%83%A8%E5%92%8C-Hop-by-hop-%E9%A6%96%E9%83%A8"><span class="toc-number">2.6.</span> <span class="toc-text">End-to-end 首部和 Hop-by-hop 首部</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-1-1-%E9%80%9A%E7%94%A8%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">3.</span> <span class="toc-text">HTTP&#x2F;1.1 通用首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cache-Control"><span class="toc-number">3.1.</span> <span class="toc-text">Cache-Control</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%98%AF%E5%90%A6%E8%83%BD%E7%BC%93%E5%AD%98%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.1.</span> <span class="toc-text">是否能缓存的指令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#public-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.1.1.</span> <span class="toc-text">public 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#private-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.1.2.</span> <span class="toc-text">private 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#no-cache-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.1.3.</span> <span class="toc-text">no-cache 指令</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%BC%93%E5%AD%98%E7%9A%84%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.2.</span> <span class="toc-text">控制可执行缓存的对象的指令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#no-store-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.2.1.</span> <span class="toc-text">no-store 指令</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A%E7%BC%93%E5%AD%98%E6%9C%9F%E9%99%90%E5%92%8C%E8%AE%A4%E8%AF%81%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.</span> <span class="toc-text">指定缓存期限和认证的指令</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#s-maxage-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.1.</span> <span class="toc-text">s-maxage 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#max-age-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.2.</span> <span class="toc-text">max-age 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#min-fresh-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.3.</span> <span class="toc-text">min-fresh 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#max-stale-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.4.</span> <span class="toc-text">max-stale 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#only-if-cached-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.5.</span> <span class="toc-text">only-if-cached 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#must-revalidate-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.6.</span> <span class="toc-text">must-revalidate 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#proxy-revalidate-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.7.</span> <span class="toc-text">proxy-revalidate 指令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#no-transform-%E6%8C%87%E4%BB%A4"><span class="toc-number">3.1.3.8.</span> <span class="toc-text">no-transform 指令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cache-Control-%E6%89%A9%E5%B1%95"><span class="toc-number">3.2.</span> <span class="toc-text">Cache-Control 扩展</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cache-extension-token"><span class="toc-number">3.2.1.</span> <span class="toc-text">cache-extension token</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Connection"><span class="toc-number">3.3.</span> <span class="toc-text">Connection</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E4%B8%8D%E5%86%8D%E8%BD%AC%E5%8F%91%E7%BB%99%E4%BB%A3%E7%90%86%E7%9A%84%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">3.3.1.</span> <span class="toc-text">控制不再转发给代理的首部字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%A1%E7%90%86%E6%8C%81%E4%B9%85%E8%BF%9E%E6%8E%A5"><span class="toc-number">3.3.2.</span> <span class="toc-text">管理持久连接</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Date"><span class="toc-number">3.4.</span> <span class="toc-text">Date</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pragma"><span class="toc-number">3.5.</span> <span class="toc-text">Pragma</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Trailer"><span class="toc-number">3.6.</span> <span class="toc-text">Trailer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Transfer-Encoding"><span class="toc-number">3.7.</span> <span class="toc-text">Transfer-Encoding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Upgrade"><span class="toc-number">3.8.</span> <span class="toc-text">Upgrade</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Via"><span class="toc-number">3.9.</span> <span class="toc-text">Via</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Warning"><span class="toc-number">3.10.</span> <span class="toc-text">Warning</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">4.</span> <span class="toc-text">请求首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept"><span class="toc-number">4.1.</span> <span class="toc-text">Accept</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Charset"><span class="toc-number">4.2.</span> <span class="toc-text">Accept-Charset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Encoding"><span class="toc-number">4.3.</span> <span class="toc-text">Accept-Encoding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Language"><span class="toc-number">4.4.</span> <span class="toc-text">Accept-Language</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Authorization"><span class="toc-number">4.5.</span> <span class="toc-text">Authorization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Expect"><span class="toc-number">4.6.</span> <span class="toc-text">Expect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#From"><span class="toc-number">4.7.</span> <span class="toc-text">From</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Host"><span class="toc-number">4.8.</span> <span class="toc-text">Host</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-Match"><span class="toc-number">4.9.</span> <span class="toc-text">If-Match</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-Modified-Since"><span class="toc-number">4.10.</span> <span class="toc-text">If-Modified-Since</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-None-Match"><span class="toc-number">4.11.</span> <span class="toc-text">If-None-Match</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-Range"><span class="toc-number">4.12.</span> <span class="toc-text">If-Range</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-Unmodified-Since"><span class="toc-number">4.13.</span> <span class="toc-text">If-Unmodified-Since</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Max-Forwards"><span class="toc-number">4.14.</span> <span class="toc-text">Max-Forwards</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Proxy-Authorization"><span class="toc-number">4.15.</span> <span class="toc-text">Proxy-Authorization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Range"><span class="toc-number">4.16.</span> <span class="toc-text">Range</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Referer"><span class="toc-number">4.17.</span> <span class="toc-text">Referer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TE"><span class="toc-number">4.18.</span> <span class="toc-text">TE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#User-Agent"><span class="toc-number">4.19.</span> <span class="toc-text">User-Agent</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">5.</span> <span class="toc-text">响应首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Ranges"><span class="toc-number">5.1.</span> <span class="toc-text">Accept-Ranges</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Age"><span class="toc-number">5.2.</span> <span class="toc-text">Age</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ETag"><span class="toc-number">5.3.</span> <span class="toc-text">ETag</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%BA-ETag-%E5%80%BC%E5%92%8C%E5%BC%B1-Tag-%E5%80%BC"><span class="toc-number">5.3.1.</span> <span class="toc-text">强 ETag 值和弱 Tag 值</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Location"><span class="toc-number">5.4.</span> <span class="toc-text">Location</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Proxy-Authenticate"><span class="toc-number">5.5.</span> <span class="toc-text">Proxy-Authenticate</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Retry-After"><span class="toc-number">5.6.</span> <span class="toc-text">Retry-After</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Server"><span class="toc-number">5.7.</span> <span class="toc-text">Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Vary"><span class="toc-number">5.8.</span> <span class="toc-text">Vary</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WWW-Authenticate"><span class="toc-number">5.9.</span> <span class="toc-text">WWW-Authenticate</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E4%BD%93%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">6.</span> <span class="toc-text">实体首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Allow"><span class="toc-number">6.1.</span> <span class="toc-text">Allow</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-Encoding"><span class="toc-number">6.2.</span> <span class="toc-text">Content-Encoding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-Language"><span class="toc-number">6.3.</span> <span class="toc-text">Content-Language</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-Length"><span class="toc-number">6.4.</span> <span class="toc-text">Content-Length</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-Location"><span class="toc-number">6.5.</span> <span class="toc-text">Content-Location</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-MD5"><span class="toc-number">6.6.</span> <span class="toc-text">Content-MD5</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-Range"><span class="toc-number">6.7.</span> <span class="toc-text">Content-Range</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Content-Type"><span class="toc-number">6.8.</span> <span class="toc-text">Content-Type</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Expires"><span class="toc-number">6.9.</span> <span class="toc-text">Expires</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Last-Modified"><span class="toc-number">6.10.</span> <span class="toc-text">Last-Modified</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA-Cookie-%E6%9C%8D%E5%8A%A1%E7%9A%84%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">7.</span> <span class="toc-text">为 Cookie 服务的首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Set-Cookie"><span class="toc-number">7.1.</span> <span class="toc-text">Set-Cookie</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#expires-%E5%B1%9E%E6%80%A7"><span class="toc-number">7.1.1.</span> <span class="toc-text">expires 属性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#path-%E5%B1%9E%E6%80%A7"><span class="toc-number">7.1.2.</span> <span class="toc-text">path 属性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#domain-%E5%B1%9E%E6%80%A7"><span class="toc-number">7.1.3.</span> <span class="toc-text">domain 属性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#secure-%E5%B1%9E%E6%80%A7"><span class="toc-number">7.1.4.</span> <span class="toc-text">secure 属性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HttpOnly-%E5%B1%9E%E6%80%A7"><span class="toc-number">7.1.5.</span> <span class="toc-text">HttpOnly 属性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cookie"><span class="toc-number">7.2.</span> <span class="toc-text">Cookie</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">8.</span> <span class="toc-text">其他首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#X-Frame-Options"><span class="toc-number">8.1.</span> <span class="toc-text">X-Frame-Options</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#X-XSS-Protection"><span class="toc-number">8.2.</span> <span class="toc-text">X-XSS-Protection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DNT"><span class="toc-number">8.3.</span> <span class="toc-text">DNT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#P3P"><span class="toc-number">8.4.</span> <span class="toc-text">P3P</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

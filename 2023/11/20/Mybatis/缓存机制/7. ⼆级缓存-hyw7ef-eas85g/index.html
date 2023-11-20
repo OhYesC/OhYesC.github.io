@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>7. ⼆级缓存 | 我的生活小站</title><meta name="author" content="Li Jing"><meta name="copyright" content="Li Jing"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="二级缓存构建在一级缓存之上，在收到查询请求时，MyBatis首先会查询二级缓存。若二级缓存未命中，再去查询一级缓存。  二级缓存和具体的命名空间绑定 一级缓存和SqlSession绑定  在按照 MyBatis 规范使用SqlSession的情况下，一级缓存不存在并发问题（因为采用了LOCK）。二级缓存则不然，二级缓存可在多个命名空间共享。这种情况下，会存在并发问题，因此需要针对性的去处理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="7. ⼆级缓存">
+<meta property="og:url" content="https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/7.%20%E2%BC%86%E7%BA%A7%E7%BC%93%E5%AD%98-hyw7ef-eas85g/index.html">
+<meta property="og:site_name" content="我的生活小站">
+<meta property="og:description" content="二级缓存构建在一级缓存之上，在收到查询请求时，MyBatis首先会查询二级缓存。若二级缓存未命中，再去查询一级缓存。  二级缓存和具体的命名空间绑定 一级缓存和SqlSession绑定  在按照 MyBatis 规范使用SqlSession的情况下，一级缓存不存在并发问题（因为采用了LOCK）。二级缓存则不然，二级缓存可在多个命名空间共享。这种情况下，会存在并发问题，因此需要针对性的去处理。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-11-20T01:35:47.994Z">
+<meta property="article:modified_time" content="2023-11-20T03:41:06.605Z">
+<meta property="article:author" content="Li Jing">
+<meta property="article:tag" content="Mybatis源码解析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/7.%20%E2%BC%86%E7%BA%A7%E7%BC%93%E5%AD%98-hyw7ef-eas85g/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '7. ⼆级缓存',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-20 11:41:06'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="我的生活小站"><span class="site-name">我的生活小站</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">7. ⼆级缓存</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-11-20T01:35:47.994Z" title="发表于 2023-11-20 09:35:47">2023-11-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-11-20T03:41:06.605Z" title="更新于 2023-11-20 11:41:06">2023-11-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/">JAVA</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/Mybatis/">Mybatis</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/JAVA/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">缓存机制</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="7. ⼆级缓存"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer">
+
+<p>二级缓存构建在一级缓存之上，在收到查询请求时，MyBatis首先会查询二级缓存。若二级缓存未命中，再去查询一级缓存。</p>
+<ul>
+<li>二级缓存和具体的命名空间绑定</li>
+<li>一级缓存和SqlSession绑定</li>
+</ul>
+<p>在按照 MyBatis 规范使用SqlSession的情况下，一级缓存不存在并发问题（因为采用了LOCK）。二级缓存则不然，二级缓存可在多个命名空间共享。这种情况下，会存在并发问题，因此需要针对性的去处理。</p>
+<p>除了并发问题，二级缓存还存在事务问题</p>
+<p><a name="f762056b"></a></p>
+<h2 id="二级缓存的逻辑"><a href="#二级缓存的逻辑" class="headerlink" title="二级缓存的逻辑"></a>二级缓存的逻辑</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">// -☆- CachingExecutor</span><br><span class="line">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, </span><br><span class="line">    RowBounds rowBounds, ResultHandler resultHandler) throws SQLException &#123;</span><br><span class="line">    BoundSql boundSql = ms.getBoundSql(parameterObject);</span><br><span class="line">    // 创建 CacheKey</span><br><span class="line">    CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);</span><br><span class="line">    return query(ms,parameterObject,rowBounds,resultHandler,key,boundSql);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, </span><br><span class="line">    RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, </span><br><span class="line">    BoundSql boundSql) throws SQLException &#123;</span><br><span class="line">    // 从 MappedStatement 中获取 Cache，注意这里的 Cache</span><br><span class="line">    // 并非是在 CachingExecutor 中创建的</span><br><span class="line">    Cache cache = ms.getCache();</span><br><span class="line">    // 如果配置文件中没有配置 &lt;cache&gt;，则 cache 为空</span><br><span class="line">    if (cache != null) &#123;</span><br><span class="line">        flushCacheIfRequired(ms);</span><br><span class="line">        if (ms.isUseCache() &amp;&amp; resultHandler == null) &#123;</span><br><span class="line">            ensureNoOutParams(ms, boundSql);</span><br><span class="line">            // 访问二级缓存</span><br><span class="line">            List&lt;E&gt; list = (List&lt;E&gt;) tcm.getObject(cache, key);</span><br><span class="line">            // 缓存未命中</span><br><span class="line">            if (list == null) &#123;</span><br><span class="line">                // 向一级缓存或者数据库进行查询</span><br><span class="line">                list = delegate.&lt;E&gt;query(ms, parameterObject, </span><br><span class="line">                    rowBounds, resultHandler, key, boundSql);</span><br><span class="line">                // 缓存查询结果</span><br><span class="line">                tcm.putObject(cache, key, list);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            return list; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return delegate.&lt;E&gt;query(</span><br><span class="line">        ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意二级缓存是从MappedStatement中获取的，而非由CachingExecutor创建。</p>
+<p>由于 MappedStatement 存在于全局配置中，可以被多个CachingExecutor获取到，这样就会出现线程安全问题。除此之外，若不加以控制，多个事务共用一个缓存实例，会导致脏读问题。</p>
+<ul>
+<li>线程安全问题可以通过SynchronizedCache装饰类解决，该装饰类会在Cache实例构造期间被添加上。</li>
+<li>脏读问题，需要借助其他类来处理，也就是上面代码中 tcm 变量对应的类型。</li>
+</ul>
+<p><a name="041fa92f"></a></p>
+<h3 id="事务缓存管理器"><a href="#事务缓存管理器" class="headerlink" title="事务缓存管理器"></a>事务缓存管理器</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">/** 事务缓存管理器 */</span><br><span class="line">public class TransactionalCacheManager &#123;</span><br><span class="line">    // Cache 与 TransactionalCache 的映射关系表</span><br><span class="line">    private final Map&lt;Cache, TransactionalCache&gt; transactionalCaches =</span><br><span class="line">        new HashMap&lt;Cache, TransactionalCache&gt;();</span><br><span class="line">        </span><br><span class="line">    public void clear(Cache cache) &#123;</span><br><span class="line">        // 获取 TransactionalCache 对象，并调用该对象的 clear 方法，下同</span><br><span class="line">        getTransactionalCache(cache).clear();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public Object getObject(Cache cache, CacheKey key) &#123;</span><br><span class="line">        return getTransactionalCache(cache).getObject(key);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void putObject(Cache cache, CacheKey key, Object value) &#123;</span><br><span class="line">        getTransactionalCache(cache).putObject(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void commit() &#123;</span><br><span class="line">        for (TransactionalCache txCache : transactionalCaches.values()) &#123;</span><br><span class="line">            txCache.commit();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void rollback() &#123;</span><br><span class="line">        for (TransactionalCache txCache : transactionalCaches.values()) &#123;</span><br><span class="line">            txCache.rollback();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    private TransactionalCache getTransactionalCache(Cache cache) &#123;</span><br><span class="line">        // 从映射表中获取 TransactionalCache</span><br><span class="line">        TransactionalCache txCache = transactionalCaches.get(cache);</span><br><span class="line">        if (txCache == null) &#123;</span><br><span class="line">            // TransactionalCache 也是一种装饰类，为 Cache 增加事务功能</span><br><span class="line">            txCache = new TransactionalCache(cache);</span><br><span class="line">            transactionalCaches.put(cache, txCache);</span><br><span class="line">        &#125;</span><br><span class="line">        return txCache;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>TransactionalCacheManager 内部维护了Cache实例与 TransactionalCache实例间的映<br>射关系，该类也仅负责维护两者的映射关系，真正做事的还是TransactionalCache。</p>
+<p>TransactionalCache 是一种缓存装饰器，可以为Cache实例增加事务功能。之前提到的<br>脏读问题正是由该类进行处理的。</p>
+<p><a name="TransactionalCache"></a></p>
+<h3 id="TransactionalCache"><a href="#TransactionalCache" class="headerlink" title="TransactionalCache"></a>TransactionalCache</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line">public class TransactionalCache implements Cache &#123;</span><br><span class="line">    private final Cache delegate;</span><br><span class="line">    private boolean clearOnCommit;</span><br><span class="line">    // 在事务被ᨀ交前，所有从数据库中查询的结果将缓存在此集合中</span><br><span class="line">    private final Map&lt;Object, Object&gt; entriesToAddOnCommit;</span><br><span class="line">    // 在事务被ᨀ交前，当缓存未命中时，CacheKey 将会被存储在此集合中</span><br><span class="line">    private final Set&lt;Object&gt; entriesMissedInCache;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public Object getObject(Object key) &#123;</span><br><span class="line">        // 查询 delegate 所代表的缓存</span><br><span class="line">        Object object = delegate.getObject(key);</span><br><span class="line">        if (object == null) &#123;</span><br><span class="line">            // 缓存未命中，则将 key 存入到 entriesMissedInCache 中</span><br><span class="line">            entriesMissedInCache.add(key);</span><br><span class="line">        &#125;</span><br><span class="line">        if (clearOnCommit) &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return object;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public void putObject(Object key, Object object) &#123;</span><br><span class="line">        // 将键值对存入到 entriesToAddOnCommit 中，而非 delegate 缓存中</span><br><span class="line">        entriesToAddOnCommit.put(key, object);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public Object removeObject(Object key) &#123;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public void clear() &#123;</span><br><span class="line">        clearOnCommit = true;</span><br><span class="line">        // 清空 entriesToAddOnCommit，但不清空 delegate 缓存</span><br><span class="line">        entriesToAddOnCommit.clear();</span><br><span class="line">    &#125;</span><br><span class="line">    public void commit() &#123;</span><br><span class="line">        // 根据 clearOnCommit 的值决定是否清空 delegate</span><br><span class="line">        if (clearOnCommit) &#123;</span><br><span class="line">            delegate.clear();</span><br><span class="line">        &#125;</span><br><span class="line">        // 刷新未缓存的结果到 delegate 缓存中</span><br><span class="line">        flushPendingEntries();</span><br><span class="line">        // 重置 entriesToAddOnCommit 和 entriesMissedInCache</span><br><span class="line">        reset();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void rollback() &#123;</span><br><span class="line">        unlockMissedEntries();</span><br><span class="line">        reset();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    private void reset() &#123;</span><br><span class="line">        clearOnCommit = false;</span><br><span class="line">        // 清空集合</span><br><span class="line">        entriesToAddOnCommit.clear();</span><br><span class="line">        entriesMissedInCache.clear();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    private void flushPendingEntries() &#123;</span><br><span class="line">        for (Map.Entry&lt;Object, Object&gt; entry : entriesToAddOnCommit.entrySet()) &#123;</span><br><span class="line">            // 将 entriesToAddOnCommit 中的内容转存到 delegate 中</span><br><span class="line">            delegate.putObject(entry.getKey(), entry.getValue());</span><br><span class="line">        &#125;</span><br><span class="line">        for (Object entry : entriesMissedInCache) &#123;</span><br><span class="line">            if (!entriesToAddOnCommit.containsKey(entry)) &#123;</span><br><span class="line">                // 存入空值</span><br><span class="line">                delegate.putObject(entry, null);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    private void unlockMissedEntries() &#123;</span><br><span class="line">        for (Object entry : entriesMissedInCache) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                // 调用 removeObject 进行解锁</span><br><span class="line">                delegate.removeObject(entry);</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                log.warn(&quot;...&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 TransactionalCache的代码中，我们要重点关注entriesToAddOnCommit集合，TransactionalCache 中的很多方法都会与这个集合打交道。</p>
+<p>该集合用于存储从查询的结果，那为什么要将结果保存在该集合中，而非delegate 所表示的缓存中呢？</p>
+<p>主要是因为直接存到delegate会导致脏数据问题。</p>
+<p><a name="dfacd737"></a></p>
+<h3 id="脏数据问题发生的过程"><a href="#脏数据问题发生的过程" class="headerlink" title="脏数据问题发生的过程"></a>脏数据问题发生的过程</h3><p>假设两个线程开启两个不同的事务，它们的执行过程如下：<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610709010127-aaa77205-a887-4b3f-9fe0-4d21fd237014.png#align=left&display=inline&height=557&originHeight=557&originWidth=987&size=165179&status=done&style=none&width=987" alt="image.png"></p>
+<ul>
+<li>时刻 2，事务 A 对记录 A 进行了更新。</li>
+<li>时刻 3，事务 A 从数据库查询记录A，并将记录 A 写入缓存中。</li>
+<li>时刻 4，事务 B 查询记录A，由于缓存中存在记录A，事务B直接从缓存中取数据。</li>
+</ul>
+<p>这个时候，脏数据问题就发生了。事务B在事务A未提交情况下，读取到了事务A所修改的记录。</p>
+<p>为了解决这个问题，我们可以为每个事务引入一个独立的缓存。查询数据时，仍从 delegate缓存（以下统称为共享缓存）中查询。若缓存未命中，则查询数据库。</p>
+<p>存储查询结果时，并不直接存储查询结果到共享缓存中，而是先存储到事务缓存中，也就是 entriesToAddOnCommit集合。当事务提交时，再将事务缓存中的缓存项转存到共享缓存中。</p>
+<p>这样，事务 B 只能在事务A提交后，才能读取到事务A所做的修改，解决了脏读问题。整个过程大致如下：<br><img src="https://cdn.nlark.com/yuque/0/2021/png/1251600/1610709019430-87bb18fd-9c3f-4d6a-8293-f5d81c16191f.png#align=left&display=inline&height=780&originHeight=780&originWidth=991&size=288438&status=done&style=none&width=991" alt="image.png"></p>
+<ul>
+<li>时刻 2，事务A和B同时查询记录A。此时共享缓存中还没没有数据，所以两个事务均会向数据库发起查询请求，并将查询结果存储到各自的事务缓存中。</li>
+<li>时刻 3，事务A更新记录A，这里把更新后的记录A记为A′。</li>
+<li>时刻4，两个事务再次进行查询。此时，事务 A 读取到的记录为修改后的值，而事务 B 读取到的记录仍为原值。</li>
+<li>时刻 5，事务 A 被提交，并将事务缓存 A 中的内容转存到共享缓存中。</li>
+<li>时刻 6，事务 B 再次查询记录A，由于共享缓存中有相应的数据，所以直接取缓存数据即可。因此得到记录 A′，而非记录 A。但由于事务 A 已经提交，所以事务 B 读取到的记录 A′ 并非是脏数据。</li>
+</ul>
+<p>MyBatis 引入事务缓存解决了脏读问题，事务间只能读取到其他事务提交后的内容，这相当于事务隔离级别中的“读已提交（ReadCommitted）”。但需要注意的时，MyBatis缓存事务机制只能解决脏读问题，并不能解决“不可重复读”问题。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io">Li Jing</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/7.%20%E2%BC%86%E7%BA%A7%E7%BC%93%E5%AD%98-hyw7ef-eas85g/">https://ohyesc.github.io/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/7.%20%E2%BC%86%E7%BA%A7%E7%BC%93%E5%AD%98-hyw7ef-eas85g/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://ohyesc.github.io" target="_blank">我的生活小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Mybatis源码解析</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/6.%20%E2%BC%80%E7%BA%A7%E7%BC%93%E5%AD%98-hyw7ef-tfg4ag/" title="6. ⼀级缓存"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">6. ⼀级缓存</div></div></a></div><div class="next-post pull-right"><a href="/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/1.%20%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86-hyw7ef-bz964g/" title="1. 插件机制原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">1. 插件机制原理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/11/20/Mybatis/%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/1.%20%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86-hyw7ef-bz964g/" title="1. 插件机制原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 插件机制原理</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/1.%20%E7%BC%93%E5%AD%98%E7%B1%BB%E4%BB%8B%E7%BB%8D-hyw7ef-tnwf0i/" title="1. 缓存类介绍"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 缓存类介绍</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E6%BA%90/1.%20%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E6%BA%90%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B-hyw7ef-oe0qhx/" title="1. 内置数据源初始化过程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 内置数据源初始化过程</div></div></a></div><div><a href="/2023/11/20/Mybatis/SQL%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/1.%20SQL%20%E6%89%A7%E2%BE%8F%E5%85%A5%E5%8F%A3-hyw7ef-zn5xqa/" title="1. SQL 执⾏入口"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. SQL 执⾏入口</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E6%98%A0%E5%B0%84%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%A7%A3%E6%9E%90%E5%85%A5%E5%8F%A3-hyw7ef-mh3yus/" title="1. 映射⽂件解析解析入口"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 映射⽂件解析解析入口</div></div></a></div><div><a href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-20</div><div class="title">1. 配置⽂件解析过程分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Li Jing</div><div class="author-info__description">这是一个老父亲答应给孩子建个网站，记录一下他的成长</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">125</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98%E7%9A%84%E9%80%BB%E8%BE%91"><span class="toc-number">1.</span> <span class="toc-text">二级缓存的逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E7%BC%93%E5%AD%98%E7%AE%A1%E7%90%86%E5%99%A8"><span class="toc-number">1.1.</span> <span class="toc-text">事务缓存管理器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TransactionalCache"><span class="toc-number">1.2.</span> <span class="toc-text">TransactionalCache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%84%8F%E6%95%B0%E6%8D%AE%E9%97%AE%E9%A2%98%E5%8F%91%E7%94%9F%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.</span> <span class="toc-text">脏数据问题发生的过程</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/1.%20%E9%85%8D%E7%BD%AE%E2%BD%82%E4%BB%B6%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90-hyw7ef-geagn5/" title="1. 配置⽂件解析过程分析">1. 配置⽂件解析过程分析</a><time datetime="2023-11-20T01:36:07.251Z" title="发表于 2023-11-20 09:36:07">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/2.%20%E8%A7%A3%E6%9E%90properties%E8%8A%82%E7%82%B9-hyw7ef-er4viw/" title="2. 解析properties节点">2. 解析properties节点</a><time datetime="2023-11-20T01:36:06.717Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/3.%20%E8%A7%A3%E6%9E%90settings%E8%8A%82%E7%82%B9-hyw7ef-diq3xg/" title="3. 解析settings节点">3. 解析settings节点</a><time datetime="2023-11-20T01:36:06.171Z" title="发表于 2023-11-20 09:36:06">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/4.%20%E8%AE%BE%E7%BD%AEsettings%E5%86%85%E5%AE%B9%E5%88%B0%20Configuration%E4%B8%AD-hyw7ef-axg91r/" title="4. 设置settings内容到 Configuration中">4. 设置settings内容到 Configuration中</a><time datetime="2023-11-20T01:36:05.477Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/11/20/Mybatis/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B/5.%20%E8%A7%A3%E6%9E%90typeAliases%E8%8A%82%E7%82%B9-hyw7ef-txspfu/" title="5. 解析typeAliases节点">5. 解析typeAliases节点</a><time datetime="2023-11-20T01:36:05.110Z" title="发表于 2023-11-20 09:36:05">2023-11-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Li Jing</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
